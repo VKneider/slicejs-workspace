@@ -86,6 +86,14 @@ Running `--project=components` is not the full suite; it silently skips visual r
 suite is ~233 tests. The web server uses `SLICE_TEST_PORT` (default `3001 + 5 = 3006`) and starts
 the local CLI, which resolves the local framework through the workspace link.
 
+**Known flakes:** the touch drag-and-drop specs and the QR canvas assertion can fail under the full
+parallel run (observed: 237 passed, 2 failed; both passed when rerun alone). Rerun a single spec
+before calling it a regression:
+
+```bash
+pnpm test:conclave -- src/Components/Providers/DragDropService/DragDropService.spec.js
+```
+
 ### `pnpm verify:conclave`
 
 The cheapest end-to-end proof of the link model:
