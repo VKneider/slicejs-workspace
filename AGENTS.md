@@ -77,7 +77,7 @@ pnpm test:framework        # node --test Slice/tests
 pnpm test:cli              # node --test
 pnpm test:visual           # unit/parser tests
 pnpm test:visual:gate      # unit + icons lint + Playwright e2e + build (heavy)
-pnpm test:conclave         # Conclave Playwright e2e (233 tests, two projects)
+pnpm test:conclave         # Conclave Playwright e2e (both projects)
 pnpm lint:conclave
 pnpm build:conclave
 pnpm build:framework
