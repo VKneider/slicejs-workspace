@@ -199,3 +199,24 @@ CI that clones the ecosystem — needs a remote for a repo that deliberately has
 second maintainer needs to release without local context. Then move to tag-triggered publishing with
 OIDC trusted publishing and provenance; never a long-lived npm token.
 
+## ADR-012 — One validation pass, two presentations
+
+**Decision:** rules that decide whether a project can ship live in the CLI's validators
+(`validateComponentProps`, `validateConfigRules`); the classification of a finding as blocking or
+advisory lives in `commands/utils/ProjectValidation.js`. `slice build` and `slice doctor` both consume
+it. Doctor exits 1 when a row fails.
+
+**Why:** both commands already called the same validator and still contradicted each other, because
+each one chose which fields to read: build blocked on source errors, doctor dropped them, and doctor
+reported prop errors as warnings. A component with a syntax error produced "Build blocked" and
+"props look good" from the two commands, on the same project. The rule was never the problem; the
+seam between "what we found" and "is it fatal" was duplicated, and it drifted.
+
+**Trade-off:** doctor's table lost a row (Components and Component Props became one), and doctor can
+now fail a pipeline, which is a behavior change for anyone scripting it.
+
+**Rule that follows:** a new validation must be added to the shared validator and classified in one
+place. If a command needs to present a finding differently, it changes the presentation, never the
+severity.
+
+
