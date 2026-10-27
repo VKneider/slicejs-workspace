@@ -21,13 +21,13 @@ then `CONTEXT.md`, then the `AGENTS.md` of the repo that owns the files you are 
 5. **Do not publish, bump versions, tag, or create releases** unless the task explicitly asks for
    a release. The whole point of the workspace is to avoid that loop.
 6. **Do not edit generated files.** Examples: `conclave/src/Components/components.js` (generated
-   by the CLI), `slice.js_visual_library` `icons.generated.js` / generated docs pages, docs site
+   by the CLI), `slicejs-components` `icons.generated.js` / generated docs pages, docs site
    `src/Components/AppComponents/*` (generated from `markdown/`). Read the owning repo's AGENTS.md.
 7. **Conclave is a production product.** Treat any change that affects it as a potential
    regression; run its tests/build before calling the work done.
 8. **Documentation is part of the change.** Every change needs a docs decision: a docs commit, or an
    explicit "no docs impact" reason. Framework/CLI behavior changes require the matching pages in
-   `repos/slice.js_docs`; component changes require `repos/slice.js_visual_library/src/markdown`.
+   `repos/slice.js_docs`; component changes require `repos/slicejs-components/src/markdown`.
    See [`docs/DOCUMENTATION.md`](docs/DOCUMENTATION.md). A change without a docs check is not done.
 9. `repos/` is gitignored. Never force-add it, vendor it, or copy subrepo code into this repo.
 
@@ -39,7 +39,7 @@ Always:
 2. `CONTEXT.md` (ecosystem map, runtime paths, current version skew).
 3. The owning repo's `AGENTS.md`.
 4. For any Slice.js framework or app code task, load the **`slice-js-developer`** skill. It is
-   vendored at `.opencode/skills/slice-js-developer` (v1.11.0) so OpenCode can use it offline. Its
+   vendored at `.opencode/skills/slice-js-developer` (v1.12.0) so OpenCode can use it offline. Its
    canonical source is `repos/slice.js_docs/skill/slice-js-developer`; update that and run
    `pnpm sync:skill` rather than editing the vendored copy.
 
@@ -49,7 +49,7 @@ Only when the task needs it:
 |---|---|
 | Framework runtime, components, router, destroy/lifecycle | `repos/slice.js/AGENTS.md`, `repos/slice.js/Slice/tests/` |
 | CLI, dev server, bundler, build, types | `repos/slicejs-cli/AGENTS.md`, `repos/slicejs-cli/CHANGELOG.md` |
-| UI components, registry, DOM/e2e behavior | `repos/slice.js_visual_library/AGENTS.md`, `COMPONENT_API_STANDARDS.md` |
+| UI components, registry, DOM/e2e behavior | `repos/slicejs-components/AGENTS.md`, `COMPONENT_API_STANDARDS.md` |
 | Component lifecycle/refresh patterns in Conclave | `repos/conclave/docs/COMPONENT-PATTERNS.md` |
 | Conclave architecture/data/features/design | `repos/conclave/docs/ARCHITECTURE.md`, `DATA.md`, `FEATURES.md`, `DESIGN.md` |
 | Conclave pitfalls (42 numbered gotchas) | `repos/conclave/docs/GOTCHAS.md` |
@@ -75,7 +75,7 @@ pnpm check:skill           # fail if the vendored skill drifted
 pnpm verify:conclave       # boot Conclave and prove the local runtime is what it serves
 
 pnpm dev:conclave          # Conclave, port 3001 (product)
-pnpm dev:visual            # visual library, port 3001
+pnpm dev:components        # Slice.js Components, port 3001
 pnpm dev:docs              # docs site, port 3001
 pnpm dev:framework         # slice.js demo, port 3001, with a self-link to the local runtime
 ```
@@ -87,21 +87,21 @@ Tests and builds:
 ```bash
 pnpm test:framework        # node --test Slice/tests
 pnpm test:cli              # node --test
-pnpm test:visual           # unit/parser tests
-pnpm test:visual:e2e       # visual library Playwright specs
-pnpm test:visual:gate      # unit + icons lint + Playwright e2e + build (heavy)
+pnpm test:components       # unit/parser tests
+pnpm test:components:e2e   # Slice.js Components Playwright specs
+pnpm test:components:gate  # unit + icons lint + Playwright e2e + build (heavy)
 pnpm test:conclave         # Conclave Playwright e2e (both projects)
 pnpm lint:conclave
 pnpm build:conclave
 pnpm start:conclave
 pnpm build:framework
-pnpm test                  # framework + CLI + visual unit suites (no e2e)
+pnpm test                  # framework + CLI + components unit suites (no e2e)
 
 # Documentation and skill
 pnpm docs:generate         # framework docs pages + routes
 pnpm docs:llm              # rebuild the docs LLM dump
-pnpm docs:lint:visual      # component Markdown contract
-pnpm docs:generate:visual  # component docs pages
+pnpm docs:lint:components  # component Markdown contract
+pnpm docs:generate:components # component docs pages
 ```
 
 `pnpm test:conclave` runs both projects (`components` and `visual`). Filtering with
@@ -117,7 +117,7 @@ below are the short form.
 ### A. Framework change (runtime, router, lifecycle, server, build contract)
 
 1. **Reproduce / define the behavior in a consumer**, preferably Conclave (production) or the
-   visual library (DOM). Write down the failing scenario.
+   Slice.js Components (DOM). Write down the failing scenario.
 2. Add a regression test in `repos/slice.js/Slice/tests/` (node:test). Use the real runtime; the
    loader in `Slice/tests/fixtures/real-runtime-loader.mjs` exists for browser-absolute imports.
    Do not mock the logic under test.
@@ -125,8 +125,8 @@ below are the short form.
    Keep browser runtime plain ESM with no build step.
 4. `pnpm test:framework`.
 5. If the change touches DOM/lifecycle, add or update the browser counterpart in
-   `repos/slice.js_visual_library` and run `pnpm test:visual:gate` (or at minimum
-   `pnpm test:visual` + the affected Playwright spec).
+   `repos/slicejs-components` and run `pnpm test:components:gate` (or at minimum
+   `pnpm test:components` + the affected Playwright spec).
 6. `pnpm verify:conclave` — this proves the app is actually running the edited source.
 7. `pnpm lint:conclave && pnpm build:conclave` if the change can affect the product.
 8. **Documentation pass (mandatory).** Use [`docs/DOCUMENTATION.md`](docs/DOCUMENTATION.md) to find
@@ -151,26 +151,26 @@ below are the short form.
 
 ### C. Visual component / registry change
 
-1. Read `repos/slice.js_visual_library/AGENTS.md` and `COMPONENT_API_STANDARDS.md`.
+1. Read `repos/slicejs-components/AGENTS.md` and `COMPONENT_API_STANDARDS.md`.
 2. Keep public props/aliases backward compatible; visual components are consumed by Conclave and
    external users.
-3. Update the component Markdown in `repos/slice.js_visual_library/src/markdown/<component>.md`.
+3. Update the component Markdown in `repos/slicejs-components/src/markdown/<component>.md`.
    Never edit generated pages.
-4. `pnpm docs:lint:visual && pnpm docs:generate:visual`.
-5. `pnpm test:visual`, then the affected Playwright specs; `pnpm build:visual` must pass
+4. `pnpm docs:lint:components && pnpm docs:generate:components`.
+5. `pnpm test:components`, then the affected Playwright specs; `pnpm build:components` must pass
    (the dev server can hide bundler errors).
-6. Commit in `repos/slice.js_visual_library`.
+6. Commit in `repos/slicejs-components`.
 
 ### D. Docs site / skill change
 
 1. Edit `repos/slice.js_docs/markdown/**/*.md` (framework docs) or
-   `repos/slice.js_visual_library/src/markdown/` (component docs).
+   `repos/slicejs-components/src/markdown/` (component docs).
 2. Run `pnpm docs:generate` and `pnpm docs:llm` from the workspace root; for component docs run
-   `pnpm docs:lint:visual` and `pnpm docs:generate:visual`.
+   `pnpm docs:lint:components` and `pnpm docs:generate:components`.
 3. Preview with `pnpm dev:docs` when the docs app can run; otherwise validate the generated output.
 4. If the skill changed, edit `repos/slice.js_docs/skill/slice-js-developer/`, bump its version and
    manifest, then `pnpm sync:skill`.
-5. Commit in `repos/slice.js_docs` (or the visual library), and commit the synced skill here.
+5. Commit in `repos/slice.js_docs` (or `repos/slicejs-components`), and commit the synced skill here.
 
 ## 5. Verifying the local link
 
@@ -205,7 +205,7 @@ Some subrepo docs were written before this workspace existed. Under the workspac
 
 - `repos/slice.js/AGENTS.md`: "editing `Slice/` does not change runtime behavior in any app until
   published". That is true for standalone clones, not for linked consumers here.
-- `repos/slice.js_visual_library/AGENTS.md` §"pnpm store architecture": it says
+- `repos/slicejs-components/AGENTS.md` §"pnpm store architecture": it says
   `node_modules/slicejs-web-framework` is a junction to `.pnpm` and that you must patch the store
   copy. **Do not do that here.** It must point directly to `repos/slice.js`; if it doesn't,
   `pnpm doctor` will fail and the fix is a root install.
@@ -230,13 +230,13 @@ them upstream, keep both contexts in mind.
 A change is done when:
 
 - [ ] It lives in the owning repo and has a focused commit.
-- [ ] The relevant unit suite passes (`test:framework` / `test:cli` / `test:visual`).
+- [ ] The relevant unit suite passes (`test:framework` / `test:cli` / `test:components`).
 - [ ] DOM/lifecycle changes have a browser test or a documented reason why not.
 - [ ] `pnpm doctor` is green.
 - [ ] For runtime/server changes: `pnpm verify:conclave` passes.
 - [ ] For product-affecting changes: `pnpm lint:conclave` and `pnpm build:conclave` pass.
 - [ ] Documentation decision recorded; user-facing changes have a docs commit in
-      `repos/slice.js_docs` (or the visual library for component docs).
+      `repos/slice.js_docs` (or `repos/slicejs-components` for component docs).
 - [ ] `pnpm docs:generate` (and `pnpm docs:llm` when relevant) ran; no generated file was hand-edited.
 - [ ] Skill updated and `pnpm sync:skill` run if guidance changed; `pnpm check:skill` is green.
 - [ ] No `node_modules`, `.pnpm`, generated files, or `repos/` content were added to this repo.

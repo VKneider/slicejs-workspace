@@ -15,7 +15,7 @@ until its documentation has been checked and, when behavior changed, updated.
 3. **Framework changes must be checked against their specific pages** (table below). Do not assume
    "the tests pass" means the docs are still true.
 4. **Docs commits live in the docs repo** (`repos/slice.js_docs`) or, for component docs, in
-   `repos/slice.js_visual_library`. They are separate commits from the code change.
+   `repos/slicejs-components`. They are separate commits from the code change.
 5. **Never edit generated output.** Edit Markdown; run the generator.
 6. **The skill is documentation too.** If guidance, traps or decisions change, update
    `repos/slice.js_docs/skill/slice-js-developer`, bump its version, and run `pnpm sync:skill`.
@@ -26,7 +26,7 @@ until its documentation has been checked and, when behavior changed, updated.
 |---|---|---|
 | Framework/CLI/config docs | `repos/slice.js_docs/markdown/**/*.md` | `repos/slice.js_docs/src/Components/AppComponents/**`, routes |
 | LLM context dump | generated from the Markdown | `repos/slice.js_docs/llm.txt` |
-| Visual/service component docs | `repos/slice.js_visual_library/src/markdown/*.md` | generated pages under `repos/slice.js_visual_library/src/Components/**` |
+| Visual/service component docs | `repos/slicejs-components/src/markdown/*.md` | generated pages under `repos/slicejs-components/src/Components/**` |
 | Agent skill | `repos/slice.js_docs/skill/slice-js-developer/` | vendored copy in `.opencode/skills/slice-js-developer/` |
 | Workspace orchestration | this repo (`AGENTS.md`, `CONTEXT.md`, `docs/`) | — |
 
@@ -39,7 +39,7 @@ offline; `pnpm sync:skill` keeps them identical. `pnpm check:skill` and `pnpm do
 |---|---|---|
 | Lifecycle (`init`, `update`, `beforeDestroy`) | `getting-started/lifecycle-overview.md`, `init-method.md`, `update-method.md`, `before-destroy.md` | visual DOM tests; skill `references/core-model.md` |
 | `slice.build`, component anatomy, static props | `getting-started/build-method.md`, `component-anatomy.md`, `static-props.md` | skill `references/core-model.md` |
-| Visual components / DOM / templates | `getting-started/visual-components.md`, `component-anatomy.md` | `repos/slice.js_visual_library/src/markdown/<component>.md` |
+| Visual components / DOM / templates | `getting-started/visual-components.md`, `component-anatomy.md` | `repos/slicejs-components/src/markdown/<component>.md` |
 | Services | `getting-started/services.md`, `project-architecture/service-patterns.md` | skill `references/core-model.md` |
 | Routing / router | `getting-started/routing.md`, `routing-guards.md`, `project-architecture/routing-data.md` | visual `multi-route` docs |
 | App Shell / MultiRoute / SPA | `project-architecture/app-shell-multiroute.md`, `single-view-spa.md`, `choosing-project-style.md`, `components/multi-route.md` | component docs |
@@ -63,15 +63,15 @@ route) instead of hiding the detail in a changelog.
 2. Implement the code and its tests (`docs/CHANGE-WORKFLOW.md`).
 3. Edit the Markdown source:
    - Framework/CLI/config: `repos/slice.js_docs/markdown/`.
-   - Visual/service component: `repos/slice.js_visual_library/src/markdown/`.
+   - Visual/service component: `repos/slicejs-components/src/markdown/`.
    - Skill: `repos/slice.js_docs/skill/slice-js-developer/`.
 4. Generate and validate:
 
    ```bash
    pnpm docs:generate          # docs site pages + routes
    pnpm docs:llm               # llm.txt (when the content belongs in the LLM dump)
-   pnpm docs:lint:visual       # component Markdown contract
-   pnpm docs:generate:visual   # component docs pages
+   pnpm docs:lint:components       # component Markdown contract
+   pnpm docs:generate:components   # component docs pages
    pnpm dev:docs               # preview
    ```
 
@@ -113,11 +113,11 @@ Documentation is static, but it has contracts:
 - [ ] Component Markdown updated for component API/behavior changes.
 - [ ] `pnpm docs:generate` run; no generated file was hand-edited.
 - [ ] `pnpm docs:llm` run when the page is part of the LLM corpus.
-- [ ] `pnpm docs:lint:visual` + `pnpm docs:generate:visual` for component docs.
+- [ ] `pnpm docs:lint:components` + `pnpm docs:generate:components` for component docs.
 - [ ] Skill updated and version bumped when guidance changed; `pnpm sync:skill` run.
 - [ ] `pnpm check:skill` green.
 - [ ] `pnpm doctor` green.
-- [ ] Docs commit exists in `repos/slice.js_docs` (or the visual library for component docs).
+- [ ] Docs commit exists in `repos/slice.js_docs` (or `repos/slicejs-components` for component docs).
 
 ## 7. Known docs-repo gaps
 

@@ -133,3 +133,22 @@ changes require a docs commit in the owning docs repo; internal-only changes req
 
 **Trade-off:** small internal changes still pay a short docs-check cost. That is intentional: the
 check is cheap, and the recorded decision prevents silent documentation debt.
+
+## ADR-009 — Rename the components repo to `slicejs-components`
+
+**Decision:** rename the GitHub repository and npm package from `slice.js_visual_library` /
+`slicejs-webframework-visual-components-library` to **`slicejs-components`**. The public product
+name stays **Slice.js Components**, matching `components.slicejs.com`.
+
+**Why:**
+
+- The old repository name described an implementation detail ("visual library") that no longer
+  matches the product: it now documents both Visual and Service components.
+- The catalog identifier was already `slicejs-components`, and the domain is
+  `components.slicejs.com`; the repo/package name should match.
+- A single name reduces confusion in the CLI registry, MCP catalog, docs and workspace manifest.
+
+**Trade-off:** this is a breaking rename for repository/package consumers. GitHub redirects old
+URLs, but the CLI, MCP, docs, skill and workspace URLs were updated explicitly. The package version
+moved to `2.0.0`; the old repository name remains only as a compatibility identifier in historical
+notes and redirects.

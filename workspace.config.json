@@ -21,11 +21,11 @@
       "required": true
     },
     {
-      "dir": "slice.js_visual_library",
-      "name": "slice.js_visual_library",
-      "package": "slicejs-webframework-visual-components-library",
+      "dir": "slicejs-components",
+      "name": "slicejs-components",
+      "package": "slicejs-components",
       "role": "components",
-      "remote": "https://github.com/VKneider/slice.js_visual_library.git",
+      "remote": "https://github.com/VKneider/slicejs-components.git",
       "branch": "master",
       "required": true
     },
@@ -60,7 +60,7 @@
   ],
   "consumers": [
     "conclave",
-    "slice.js_visual_library",
+    "slicejs-components",
     "slice.js_docs",
     "slicejs-cli"
   ]

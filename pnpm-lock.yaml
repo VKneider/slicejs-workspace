@@ -125,7 +125,7 @@ importers:
         specifier: link:../slice.js
         version: link:../slice.js
 
-  repos/slice.js_visual_library:
+  repos/slicejs-components:
     dependencies:
       compression:
         specifier: ^1.8.1

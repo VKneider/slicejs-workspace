@@ -241,7 +241,7 @@ function checkStaleBuilds() {
   }
   const runtimeHash = sha256(runtime);
 
-  for (const consumerName of ['conclave', 'slice.js_visual_library']) {
+  for (const consumerName of ['conclave', 'slicejs-components']) {
     const distRuntime = join(repoPath(consumerName), 'dist', 'Slice', 'Slice.js');
     if (!existsSync(distRuntime)) {
       log.info(`[info] ${consumerName}: no dist/Slice/Slice.js (not built).`);

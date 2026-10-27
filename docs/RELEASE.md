@@ -9,7 +9,7 @@ specific order, after the local validation described in [`TESTING.md`](./TESTING
 |---|---|---|---|
 | 1 | `slice.js` | `slicejs-web-framework` | Runtime, server and build contract consumed by everyone. |
 | 2 | `slicejs-cli` | `slicejs-cli` | Dev/build tooling; depends on the framework. |
-| 3 | `slice.js_visual_library` | `slicejs-webframework-visual-components-library` | Components depend on both framework and CLI. |
+| 3 | `slicejs-components` | `slicejs-components` | Components depend on both framework and CLI. |
 | 4 | `slice.js_docs` | not published (Vercel) | Docs depend on the new versions. |
 | 5 | `conclave` | not published (Vercel) | Product consumes the released packages. |
 
@@ -20,7 +20,7 @@ Do not publish a dependent package before its dependency is available on npm.
 | Consumer | Framework | CLI | Notes |
 |---|---|---|---|
 | `slicejs-cli` | `^3.5.0` declared (stale; effectively 4.x) | — | The declared range is a known inconsistency; fix it when releasing a 4.x CLI. |
-| visual library | `^4.0.2` | `^4.3.0` | Already on 4.x. |
+| Slice.js Components | `^4.0.2` | `^4.3.0` | Already on 4.x. |
 | docs | `^3.5.1` | `^3.7.2` | Not yet upgraded; the workspace links it to 4.x to surface breakage. |
 | conclave | `^4.0.2` | `4.2.0` pinned | Bump the CLI when validating a new one. |
 
@@ -36,11 +36,11 @@ Run from the workspace root:
 - [ ] `pnpm check:skill` — vendored skill matches the docs source.
 - [ ] `pnpm test` — framework + CLI + visual unit suites.
 - [ ] `pnpm verify:conclave` — the product serves the local runtime.
-- [ ] `pnpm test:visual:gate` if framework lifecycle/render behavior changed.
+- [ ] `pnpm test:components:gate` if framework lifecycle/render behavior changed.
 - [ ] `pnpm test:conclave` for product-affecting changes.
 - [ ] `pnpm lint:conclave && pnpm build:conclave`.
 - [ ] Docs updated for every user-facing change; `pnpm docs:generate` and `pnpm docs:llm` ran;
-      docs commit exists in `repos/slice.js_docs` (or the visual library for component docs).
+      docs commit exists in `repos/slice.js_docs` (or `repos/slicejs-components` for component docs).
 - [ ] If agent guidance changed: skill version bumped in the docs repo and `pnpm sync:skill` run;
       the synced skill is committed here.
 - [ ] Every changed repo has a clean, focused commit and an updated `CHANGELOG.md` per its own
@@ -70,12 +70,12 @@ Each repo follows its own rules:
 - `slice.js`: SemVer + `CHANGELOG.md`.
 - `slicejs-cli`: Keep a Changelog + SemVer; see its `AGENTS.md` for the exact release steps
   (bump, move `[Unreleased]`, compare links, commit, tag, push, GitHub release).
-- `slice.js_visual_library`: SemVer + `CHANGELOG.md`; public props keep backward-compatible
+- `slicejs-components`: SemVer + `CHANGELOG.md`; public props keep backward-compatible
   aliases.
 - `slice.js_docs`: deploy-only; no npm package.
 - `conclave`: deploy-only; no npm package.
 
-Breaking framework changes require a major bump and a coordinated release of CLI, visual library
+Breaking framework changes require a major bump and a coordinated release of CLI, Slice.js Components
 and products.
 
 ## 6. Publishing commands
@@ -91,8 +91,8 @@ pnpm publish --access public
 cd ../slicejs-cli
 pnpm publish --access public
 
-# visual library (if changed)
-cd ../slice.js_visual_library
+# Slice.js Components (if changed)
+cd ../slicejs-components
 pnpm publish --access public
 ```
 
@@ -101,7 +101,7 @@ Then tag/push each repo according to its own changelog instructions. Do **not** 
 
 ## 7. After publishing
 
-1. Update consumer ranges/lockfiles in the consuming repos (`slicejs-cli`, visual library, docs,
+1. Update consumer ranges/lockfiles in the consuming repos (`slicejs-cli`, Slice.js Components, docs,
    conclave).
 2. Run `pnpm install` from the workspace root.
 3. Run `pnpm doctor`. Drift warnings for those packages should disappear once the declared ranges

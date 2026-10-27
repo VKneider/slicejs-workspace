@@ -26,13 +26,13 @@ Common root causes:
 |---|---|
 | `node_modules/slicejs-web-framework` points into `.pnpm` | `pnpm install --force` at the workspace root, then `pnpm doctor`. |
 | Someone ran `pnpm install` inside the subrepo | Same as above. |
-| Old `dist/Slice/Slice.js` | `pnpm build:conclave` / `pnpm build:visual`. |
+| Old `dist/Slice/Slice.js` | `pnpm build:conclave` / `pnpm build:components`. |
 | Browser cached the runtime | Hard reload. |
 | Dev server was not restarted after a CLI/framework server change | Restart `pnpm dev:conclave`. |
 | A component was not registered | Run the CLI's `component list`/`doctor` inside the app, or check `components.js`. |
 
 **Never** "fix" this by editing the copy in `node_modules/.pnpm`. That was a workaround in the
-pre-workspace visual library; here it is the bug.
+pre-workspace Slice.js Components; here it is the bug.
 
 ## 2. `pnpm install` inside a subrepo broke the links
 
@@ -99,9 +99,9 @@ Get-Process -Id <pid>
 pnpm setup:browsers
 ```
 
-That installs Chromium for both the visual library (project-local browsers) and Conclave (machine
-cache). Installing Playwright browsers from an arbitrary directory can put them where the visual
-library's config does not look.
+That installs Chromium for both `repos/slicejs-components` (project-local browsers) and Conclave (machine
+cache). Installing Playwright browsers from an arbitrary directory can put them where the
+`slicejs-components` config does not look.
 
 The visual and component projects use Chromium only. Touch specs that construct `TouchEvent` are
 Chromium-specific.

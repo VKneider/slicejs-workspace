@@ -7,7 +7,7 @@ is the recipe to follow.
 ## 1. Principles
 
 1. **Start from a consumer scenario.** A framework or CLI change exists to fix/improve a real app.
-   Reproduce it in Conclave (production) or the visual library (DOM) before editing.
+   Reproduce it in Conclave (production) or Slice.js Components (DOM) before editing.
 2. **Test at the lowest level that can express the bug**, then prove it at the product level.
    A unit test alone does not prove the dev server serves it; a manual reload alone does not protect
    the next change.
@@ -20,7 +20,7 @@ is the recipe to follow.
 6. **Never publish in the inner loop.** Local links replace npm. Publishing is a release activity,
    not a testing step.
 7. **Documentation is part of the change.** Every change needs a docs decision. User-facing changes
-   require a docs commit in `repos/slice.js_docs` (or the visual library for component docs);
+   require a docs commit in `repos/slice.js_docs` (or `repos/slicejs-components` for component docs);
    internal-only changes must record why no docs change was needed. See
    [`DOCUMENTATION.md`](./DOCUMENTATION.md).
 
@@ -55,8 +55,8 @@ pnpm setup:browsers
 | Build, bundling, minification | `repos/slicejs-cli/commands/build*/`, `commands/bundle/`, `utils/bundling/` | `pnpm test:cli` + `pnpm build:framework` + `pnpm build:conclave` |
 | Init/scaffold, component registry | `repos/slicejs-cli/commands/init/`, `getComponent/`, `createComponent/` | `pnpm test:cli` + scratch project |
 | Types generation | `repos/slicejs-cli/commands/types/` | `pnpm test:cli` + `slice:types` in a consumer |
-| Official components | `repos/slice.js_visual_library/` | `pnpm test:visual` + targeted e2e + `pnpm build:visual` |
-| Component docs | `repos/slice.js_visual_library/src/markdown/` | `pnpm docs:lint:visual` + `pnpm docs:generate:visual` |
+| Official components | `repos/slicejs-components/` | `pnpm test:components` + targeted e2e + `pnpm build:components` |
+| Component docs | `repos/slicejs-components/src/markdown/` | `pnpm docs:lint:components` + `pnpm docs:generate:components` |
 | Docs content | `repos/slice.js_docs/markdown/` | `pnpm docs:generate` + `pnpm docs:llm` + `pnpm dev:docs` |
 | Skill guidance | `repos/slice.js_docs/skill/slice-js-developer/` | edit source + bump version + `pnpm sync:skill` + `pnpm check:skill` |
 
@@ -64,7 +64,7 @@ If a change spans repos, implement in dependency order (framework → CLI → vi
 commit each repo separately.
 
 Load the **`slice-js-developer`** skill for any Slice.js framework/app code task. It is vendored at
-`.opencode/skills/slice-js-developer` (v1.11.0) from `repos/slice.js_docs/skill/`. If the change
+`.opencode/skills/slice-js-developer` (v1.12.0) from `repos/slice.js_docs/skill/`. If the change
 alters guidance an agent relies on, update the skill source, bump its version, and run
 `pnpm sync:skill`.
 
@@ -73,7 +73,7 @@ alters guidance an agent relies on, update the skill source, bump its version, a
 ### Phase 0 — Reproduce and define
 
 1. `pnpm doctor` (links must be green).
-2. Run the consumer: `pnpm dev:conclave` (product) or `pnpm dev:visual` (DOM/components).
+2. Run the consumer: `pnpm dev:conclave` (product) or `pnpm dev:components` (DOM/components).
 3. Write down the exact route, component, action and expected/actual result.
 4. Read the relevant invariants first:
    - `repos/slice.js/AGENTS.md` (destroy model, reserved directives, bare imports).
@@ -86,7 +86,7 @@ alters guidance an agent relies on, update the skill source, bump its version, a
 ### Phase 1 — Write the failing test
 
 - **No DOM:** add a test under `repos/slice.js/Slice/tests/`.
-- **Real DOM/lifecycle:** add a spec under `repos/slice.js_visual_library/` (the framework repo only
+- **Real DOM/lifecycle:** add a spec under `repos/slicejs-components/` (the framework repo only
   has node:test).
 - Use the real runtime. For browser-absolute imports, use
   `Slice/tests/fixtures/real-runtime-loader.mjs`; do not mock the logic under test.
@@ -112,7 +112,7 @@ The test must fail for the right reason before the fix.
 | Touched area | Commands |
 |---|---|
 | Runtime, no DOM | `pnpm test:framework` → `pnpm verify:conclave` |
-| Lifecycle/DOM | `pnpm test:framework` → `pnpm test:visual:e2e -- <spec>` → `pnpm verify:conclave` |
+| Lifecycle/DOM | `pnpm test:framework` → `pnpm test:components:e2e -- <spec>` → `pnpm verify:conclave` |
 | Router/loading | `pnpm test:framework` → affected Conclave navigation spec → `pnpm verify:conclave` |
 | Server/security/env | `pnpm test:framework` → `pnpm verify:conclave` → `pnpm build:conclave` → `pnpm start:conclave` |
 | Build/runtime packaging | `pnpm test:framework` → `pnpm build:framework` → `pnpm build:conclave` |
@@ -165,8 +165,8 @@ full parallel run. Rerun the single spec before calling it a regression.
 ### Phase 6 — Commit and close
 
 1. Commit in `repos/slice.js` (framework + unit test).
-2. If you added/changed a DOM test, commit in `repos/slice.js_visual_library`.
-3. Commit the docs in `repos/slice.js_docs` (or the visual library for component docs).
+2. If you added/changed a DOM test, commit in `repos/slicejs-components`.
+3. Commit the docs in `repos/slice.js_docs` (or `repos/slicejs-components` for component docs).
 4. If you added a product regression test, commit in `repos/conclave`.
 5. Commit the synced skill in this workspace.
 6. Update `CHANGELOG.md` only when preparing a release, following that repo's rules.
@@ -306,12 +306,12 @@ pnpm test:cli
 node scripts/run-in-repo.mjs slicejs-cli node --test "tests/path-helper.test.js"
 node scripts/run-app-script.mjs conclave slice:doctor
 
-# Visual library
-pnpm test:visual
-pnpm test:visual:e2e -- src/Components/Visual/Button/Button.spec.js
-pnpm test:visual:e2e:visual
-pnpm test:visual:gate
-pnpm build:visual
+# Slice.js Components
+pnpm test:components
+pnpm test:components:e2e -- src/Components/Visual/Button/Button.spec.js
+pnpm test:components:e2e:visual
+pnpm test:components:gate
+pnpm build:components
 
 # Conclave (product)
 pnpm test:conclave -- src/Components/Providers/DragDropService/DragDropService.spec.js
@@ -323,8 +323,8 @@ pnpm start:conclave
 # Documentation and skill
 pnpm docs:generate
 pnpm docs:llm
-pnpm docs:lint:visual
-pnpm docs:generate:visual
+pnpm docs:lint:components
+pnpm docs:generate:components
 pnpm sync:skill
 pnpm check:skill
 ```
@@ -351,7 +351,7 @@ See [`TROUBLESHOOTING.md`](./TROUBLESHOOTING.md) for symptoms and fixes.
 | CLI wiring | CLI contract test + the command actually runs + CLI docs update |
 | CLI dev server | CLI test + `dev:framework` + `verify:conclave` + docs update |
 | CLI build/bundler | CLI test + both builds + product start + docs update |
-| Visual component | unit + affected e2e + `build:visual` + component Markdown update |
+| Visual component | unit + affected e2e + `build:components` + component Markdown update |
 | Skill guidance | skill source updated + version bumped + `pnpm sync:skill` + `pnpm check:skill` |
 | Release | full pre-release checklist in `RELEASE.md`, including the packed artifact |
 

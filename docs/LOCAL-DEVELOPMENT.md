@@ -55,7 +55,7 @@ pnpm install             # correct
 pnpm install --force     # correct, when links look stale
 ```
 
-Do **not** run `pnpm install` inside `repos/conclave`, `repos/slice.js_visual_library`, etc.
+Do **not** run `pnpm install` inside `repos/conclave`, `repos/slicejs-components`, etc.
 Conclave has its own `pnpm-workspace.yaml` (pnpm settings, no packages). When pnpm finds that file,
 it can treat the subrepo as its own workspace root and resolve `slicejs-web-framework` from the
 registry again, replacing the direct links.
@@ -90,7 +90,7 @@ you use), and the CLI falls back to `cwd`.
 
 ```bash
 pnpm dev:conclave   # http://localhost:3001
-pnpm dev:visual     # http://localhost:3001
+pnpm dev:components     # http://localhost:3001
 pnpm dev:docs       # http://localhost:3001
 pnpm dev:framework  # http://localhost:3001
 ```

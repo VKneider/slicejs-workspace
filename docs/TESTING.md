@@ -9,11 +9,11 @@ suites that actually validate them. For the end-to-end change strategy (reproduc
 | Change | Minimum | Recommended |
 |---|---|---|
 | Framework runtime (`Slice/`), no DOM | `pnpm test:framework` | + `pnpm verify:conclave` |
-| Framework lifecycle / DOM behavior | `pnpm test:framework` | + `pnpm test:visual:gate` + `pnpm verify:conclave` |
+| Framework lifecycle / DOM behavior | `pnpm test:framework` | + `pnpm test:components:gate` + `pnpm verify:conclave` |
 | Framework server / `api/framework` | `pnpm test:framework` | + `pnpm verify:conclave` + `pnpm build:conclave` |
 | CLI command / PathHelper / bundler | `pnpm test:cli` | + `pnpm dev:conclave` or `pnpm build:conclave` |
-| Visual component / registry | `pnpm test:visual` | + affected Playwright specs + `pnpm build:visual` |
-| Visual library full gate | `pnpm test:visual:gate` | — |
+| Visual component / registry | `pnpm test:components` | + affected Playwright specs + `pnpm build:components` |
+| Slice.js Components full gate | `pnpm test:components:gate` | — |
 | Conclave UI / domain | `pnpm lint:conclave` | + affected specs + `pnpm build:conclave` |
 | Conclave full regression | `pnpm test:conclave` | + `pnpm verify:conclave` |
 | Docs content | `pnpm docs:generate` | + `pnpm docs:llm` + `pnpm dev:docs` |
@@ -37,7 +37,7 @@ Runs `node --test Slice/tests` inside `repos/slice.js`. It covers the runtime wi
 Some tests use `Slice/tests/fixtures/real-runtime-loader.mjs` to resolve the browser-absolute
 `/Components/components.js`. Do not replace the real runtime with mocks of the logic under test.
 
-Anything that needs a genuine DOM belongs in the visual library, not here.
+Anything that needs a genuine DOM belongs in `repos/slicejs-components`, not here.
 
 ### `pnpm test:cli`
 
@@ -54,11 +54,11 @@ symlink requires **Developer Mode** (or an elevated shell). Without it the suite
 link failure; `pnpm doctor` detects it. Enable Developer Mode (Settings → Privacy & security → For
 developers) or run the suite elevated.
 
-### `pnpm test:visual`
+### `pnpm test:components`
 
-Runs the visual library's unit/parser suite (`node --test` with the path-resolution hook).
+Runs Slice.js Components unit/parser suite (`node --test` with the path-resolution hook).
 
-### `pnpm test:visual:gate`
+### `pnpm test:components:gate`
 
 Runs, in order:
 
@@ -74,7 +74,7 @@ a full framework + components regression gate.
 Prerequisites:
 
 ```bash
-cd repos/slice.js_visual_library
+cd repos/slicejs-components
 pnpm exec playwright install chromium
 ```
 
@@ -123,7 +123,7 @@ for the layer you touched:
 
 ```bash
 pnpm build:framework
-pnpm build:visual
+pnpm build:components
 pnpm build:conclave
 ```
 
@@ -145,12 +145,12 @@ pnpm setup:browsers
 
 That script installs Chromium for both e2e surfaces with the right storage model:
 
-- `repos/slice.js_visual_library` sets `PLAYWRIGHT_BROWSERS_PATH=0`, so its browsers live under the
+- `repos/slicejs-components` sets `PLAYWRIGHT_BROWSERS_PATH=0`, so its browsers live under the
   workspace `node_modules` and are removed with it.
 - `repos/conclave` uses the machine-level Playwright cache.
 
-Do not run `playwright install` from an arbitrary directory: a plain install without the visual
-library's project-local setting puts the browser where the config will not find it.
+Do not run `playwright install` from an arbitrary directory: a plain install without the Slice.js
+Components project-local setting puts the browser where the config will not find it.
 
 If an HTML report fails with `EACCES`, use `--reporter=line` or point
 `PLAYWRIGHT_HTML_REPORT` at a writable directory.
@@ -175,12 +175,12 @@ Documentation has contracts too (see [`DOCUMENTATION.md`](./DOCUMENTATION.md)):
 pnpm check:skill                 # vendored skill matches repos/slice.js_docs/skill
 pnpm docs:generate               # docs pages/routes regenerate without errors
 pnpm docs:llm                    # llm.txt regenerates
-pnpm docs:lint:visual            # component Markdown contract
-pnpm docs:generate:visual        # component docs regenerate
+pnpm docs:lint:components            # component Markdown contract
+pnpm docs:generate:components        # component docs regenerate
 ```
 
 On a clean checkout these commands must leave no diff. Locally, inspect the diff and commit the
-docs in `repos/slice.js_docs` (or the visual library) before calling the change done. Generated
+docs in `repos/slice.js_docs` (or `repos/slicejs-components`) before calling the change done. Generated
 pages under `src/Components/AppComponents/` are never edited by hand.
 
 ## 7. CI shape

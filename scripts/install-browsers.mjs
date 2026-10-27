@@ -6,8 +6,8 @@ import { log, repoByName, repoPath } from './lib/workspace.mjs';
 
 const targets = [
   {
-    repo: 'slice.js_visual_library',
-    label: 'visual library (project-local browsers)',
+    repo: 'slicejs-components',
+    label: 'Slice.js Components (project-local browsers)',
     env: { PLAYWRIGHT_BROWSERS_PATH: '0' },
   },
   {

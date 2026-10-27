@@ -7,7 +7,7 @@ wins (and this file should be updated).
 ## 1. Core idea
 
 Slice.js is developed across several independent repositories that are published as npm packages:
-framework, CLI, visual library, documentation and products. The traditional loop is:
+framework, CLI, Slice.js Components, documentation and products. The traditional loop is:
 
 ```
 edit slice.js -> publish slicejs-web-framework -> bump the product -> install -> test
@@ -28,7 +28,7 @@ There is no `npm publish` in the inner loop, no manual copy into the pnpm store 
 |---|---|---|---|---|
 | `repos/slice.js` | `slicejs-web-framework` | 4.0.2 | Framework runtime + `api/framework` + demo app | `vkneider/slice.js` |
 | `repos/slicejs-cli` | `slicejs-cli` | 4.3.0 | CLI: dev server, build, init, components, types | `vkneider/slicejs-cli` |
-| `repos/slice.js_visual_library` | `slicejs-webframework-visual-components-library` | 1.5.0 | Visual/service components, registry, component docs, DOM e2e | `VKneider/slice.js_visual_library` |
+| `repos/slicejs-components` | `slicejs-components` | 2.0.0 | Slice.js Components: official visual/service components, registry, component docs and DOM e2e | `VKneider/slicejs-components` |
 | `repos/slice.js_docs` | `slicedocs` | 3.8.0 | Markdown-generated documentation site | `vkneider/slice.js_docs` |
 | `repos/conclave` | `teams-organizer` | 1.0.0 | Real production product (group decision-making) | `vkneider/conclave` |
 
@@ -40,7 +40,7 @@ All local workspace branches are `master`.
 graph TD
   FW["slicejs-web-framework<br/>repos/slice.js"]
   CLI["slicejs-cli<br/>repos/slicejs-cli"]
-  VL["visual library<br/>repos/slice.js_visual_library"]
+  VL["Slice.js Components<br/>repos/slicejs-components"]
   DOCS["slicedocs<br/>repos/slice.js_docs"]
   CON["teams-organizer (Conclave)<br/>repos/conclave"]
 
@@ -91,7 +91,7 @@ serving an old `dist/`, you will not see the change: rebuild.
   dependency optimizer, static/precompressed serving.
 - `src/` + `api/index.js` form the repo's own **demo app**.
 - `types/` exposes the TypeScript declarations.
-- Tests: `node --test Slice/tests` (unit; anything that needs a DOM lives in the visual library).
+- Tests: `node --test Slice/tests` (unit; anything that needs a DOM lives in Slice.js Components).
 - The repo's `AGENTS.md` documents the destroy model, `childrenIndex`, services and directive rules
   (`id`, `sliceId`, `singleton`).
 
@@ -108,14 +108,14 @@ serving an old `dist/`, you will not see the change: rebuild.
 - Tests: `node --test`, with temporary projects; it prefers `../slice.js` as the framework when
   present (that is why the workspace keeps the repos as siblings inside `repos/`).
 
-### `slice.js_visual_library` — official components
+### `slicejs-components` — official components
 
 - Registry of visual components and services; `src/Components/components.js` is the registry.
 - `src/markdown/` + `parser/` generate the component documentation.
 - It is the **real DOM e2e** surface: Playwright mounts components at `/__test` and tests
   lifecycle, destroy, drag & drop and visual regression.
 - Component docs source of truth: `src/markdown/<component>.md`; generated pages are never edited by
-  hand. Run `pnpm docs:lint:visual` + `pnpm docs:generate:visual` after changing a component API.
+  hand. Run `pnpm docs:lint:components` + `pnpm docs:generate:components` after changing a component API.
 - `test:gate` = unit + icon lint + e2e + build. It is the most complete gate in the ecosystem.
 - Key rules: public props with backwards-compatible aliases, exactly one export per module, never
   edit `icons.generated.js`, no domain logic in visual components.
@@ -156,7 +156,7 @@ resolve. `pnpm doctor` reports the differences.
 Current skew:
 
 - `slicejs-cli@4.3.0` declares `slicejs-web-framework: ^3.5.0`, but the workspace links it to
-  4.0.2. That is a stale declaration in the CLI; the visual library already uses CLI 4.3.0 +
+  4.0.2. That is a stale declaration in the CLI; Slice.js Components already uses CLI 4.3.0 +
   framework 4.0.2. If something in the CLI breaks only in the workspace, check this combination
   first.
 - `conclave` declares `slicejs-cli@4.2.0` and `slicejs-web-framework: ^4.0.2`; the workspace gives
@@ -173,14 +173,14 @@ Current skew:
 |---|---|---|
 | `pnpm test:framework` | Pure runtime, server, router, build orchestration | Low |
 | `pnpm test:cli` | CLI contracts, PathHelper, bundler, types | Low |
-| `pnpm test:visual` | Components without a real DOM, parser, utilities | Medium |
-| `pnpm test:visual:gate` | Real DOM + visual regression + build | High |
+| `pnpm test:components` | Components without a real DOM, parser, utilities | Medium |
+| `pnpm test:components:gate` | Real DOM + visual regression + build | High |
 | `pnpm test:conclave` | The full real product (two Playwright projects) | High |
 | `pnpm verify:conclave` | That the product boots and serves the local runtime | Low/medium |
 | `pnpm build:conclave` | Production build + local runtime copy | Medium |
 
 For a runtime change, the reasonable minimum is: framework unit test + `verify:conclave`.
-For a lifecycle/DOM change: unit + visual library e2e + `verify:conclave`.
+For a lifecycle/DOM change: unit + Slice.js Components e2e + `verify:conclave`.
 For a Conclave UI change: lint + build + the affected specs.
 
 ## 8. Minimal glossary
@@ -205,7 +205,7 @@ For a Conclave UI change: lint + build + the affected specs.
 - Runtime architecture: `repos/slice.js/Slice/` and `repos/slice.js/AGENTS.md`.
 - How apps are served/built: `repos/slicejs-cli/commands/startServer/`,
   `commands/buildProduction/`.
-- Components and lifecycle: `repos/slice.js_visual_library/AGENTS.md` +
+- Components and lifecycle: `repos/slicejs-components/AGENTS.md` +
   `repos/conclave/docs/COMPONENT-PATTERNS.md`.
 - Real-world pitfalls: `repos/conclave/docs/GOTCHAS.md` (numbered; §32 does not exist).
 - Working contract: root `AGENTS.md`.
@@ -215,13 +215,13 @@ For a Conclave UI change: lint + build + the affected specs.
 
 ## 10. Skill and documentation
 
-The workspace ships the `slice-js-developer` skill (v1.11.0, targets framework 4.x) so agents load
+The workspace ships the `slice-js-developer` skill (v1.12.0, targets framework 4.x) so agents load
 Slice's mental model before writing code. Its canonical source is the docs repo; the vendored copy
 exists for offline OpenCode use. `pnpm check:skill` / `pnpm doctor` report drift.
 
 Documentation is not optional. Every change needs a docs decision: a docs commit for user-facing
 behavior, or a recorded reason for no docs impact. Framework changes must be checked against the
 matching pages in `repos/slice.js_docs/markdown/`; component changes against
-`repos/slice.js_visual_library/src/markdown/`; skill guidance changes against the skill source +
+`repos/slicejs-components/src/markdown/`; skill guidance changes against the skill source +
 `VERSION` + `skill/manifest.json`. The full policy, mapping and commands live in
 [`docs/DOCUMENTATION.md`](./docs/DOCUMENTATION.md).

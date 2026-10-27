@@ -23,7 +23,7 @@ slice-workspace/
 - Node.js **>= 20** (the ecosystem targets 20+; this workspace was verified on Node 22).
 - pnpm **11.x** (`corepack enable` or the official installer).
 - Git.
-- Playwright + Chromium only for e2e. Install them with `pnpm setup:browsers` (the visual library
+- Playwright + Chromium only for e2e. Install them with `pnpm setup:browsers` (Slice.js Components
   uses project-local browsers; Conclave uses the machine cache).
 - On Windows, enable **Developer Mode** (or use an elevated shell) for the CLI test suite: some
   tests create directory symlinks and fail with `EPERM` otherwise. `pnpm doctor` reports this.
@@ -56,38 +56,38 @@ work.
 |---|---|
 | `pnpm bootstrap` | Clones missing repos and installs dependencies. `--no-install` skips the install. |
 | `pnpm bootstrap --pull` | Also fetches and fast-forwards clean repos. |
-| `pnpm setup:browsers` | Installs Playwright Chromium for the visual library and Conclave. |
+| `pnpm setup:browsers` | Installs Playwright Chromium for Slice.js Components and Conclave. |
 | `pnpm sync:skill` | Copies the canonical `slice-js-developer` skill from the docs repo. |
 | `pnpm check:skill` | Fails if the vendored skill drifted from the docs source. |
 | `pnpm docs:generate` | Regenerates the framework docs pages and routes. |
 | `pnpm docs:llm` | Rebuilds the docs LLM dump (`llm.txt`). |
-| `pnpm docs:lint:visual` | Validates the visual library component Markdown. |
-| `pnpm docs:generate:visual` | Regenerates the visual component docs pages. |
+| `pnpm docs:lint:components` | Validates Slice.js Components component Markdown. |
+| `pnpm docs:generate:components` | Regenerates the component docs pages. |
 | `pnpm doctor` | Checks repos, branches, `slicejs-web-framework`/`slicejs-cli` resolution and version drift. |
 | `pnpm status` | Aggregated Git status for every repo. |
 | `pnpm sync` | Fetches all remotes and reports ahead/behind. `sync:pull` performs a safe fast-forward. |
 | `pnpm dev:conclave` | Starts Conclave (the real product) against the local framework. |
-| `pnpm dev:visual` | Starts the visual component library. |
+| `pnpm dev:components` | Starts Slice.js Components. |
 | `pnpm dev:docs` | Starts the documentation site. |
 | `pnpm dev:framework` | Starts the `slice.js` demo with the local CLI and a runtime self-link. |
 | `pnpm verify:conclave` | End-to-end smoke test of the local link (boot + served runtime + HTTP). |
 | `pnpm test:framework` | Framework unit tests (`node --test`). |
 | `pnpm test:cli` | CLI tests (`node --test`). |
-| `pnpm test:visual` | Visual library unit/parser tests. |
-| `pnpm test:visual:e2e` | Visual library Playwright component specs. |
-| `pnpm test:visual:gate` | Full visual gate: unit + icons + e2e + build. |
+| `pnpm test:components` | Slice.js Components unit/parser tests. |
+| `pnpm test:components:e2e` | Slice.js Components Playwright component specs. |
+| `pnpm test:components:gate` | Full components gate: unit + icons + e2e + build. |
 | `pnpm test:conclave` | Conclave e2e (Playwright, both projects). |
 | `pnpm build:conclave` | Conclave production build (copies the local runtime into `dist/`). |
 | `pnpm start:conclave` | Serve Conclave's production build locally. |
 | `pnpm lint:conclave` | Conclave ESLint. |
 | `pnpm build:framework` | Builds the framework demo with the local CLI. |
-| `pnpm test` | Framework + CLI + visual unit suites (no e2e). |
+| `pnpm test` | Framework + CLI + components unit suites (no e2e). |
 
 ## How local linking works
 
 `pnpm-workspace.yaml` declares `repos/*` as workspace projects and uses `overrides` to force
 **every** dependency on `slicejs-web-framework` or `slicejs-cli` — including transitive ones from
-the CLI or the visual library — to resolve to `repos/slice.js` and `repos/slicejs-cli` through
+the CLI or Slice.js Components — to resolve to `repos/slice.js` and `repos/slicejs-cli` through
 `link:`.
 
 Practical consequences:
@@ -112,7 +112,7 @@ The workspace vendors the canonical **`slice-js-developer`** skill from
 loads it automatically, so agents get the Slice.js mental model, decision rules and references
 without network access.
 
-- Current version: **1.11.0** (targets `slicejs-web-framework ^4.0.x`).
+- Current version: **1.12.0** (targets `slicejs-web-framework ^4.0.x`).
 - The docs repo is the source of truth. Edit the skill there, bump `VERSION` and
   `skill/manifest.json`, then run `pnpm sync:skill`.
 - `pnpm check:skill` and `pnpm doctor` detect drift between the vendored copy and the docs source.
@@ -124,7 +124,7 @@ queries. The vendored skill remains fully usable offline via its `references/` d
 ## Documentation is part of the change
 
 A framework or CLI change is not complete until its documentation is checked. User-facing changes
-require a docs commit in `repos/slice.js_docs` (or `repos/slice.js_visual_library/src/markdown` for
+require a docs commit in `repos/slice.js_docs` (or `repos/slicejs-components/src/markdown` for
 component docs). Internal-only changes still require a docs check and a recorded "no docs impact"
 reason.
 
@@ -134,7 +134,7 @@ from framework area to documentation pages. The short version:
 ```bash
 pnpm docs:generate
 pnpm docs:llm
-pnpm docs:lint:visual && pnpm docs:generate:visual   # component docs
+pnpm docs:lint:components && pnpm docs:generate:components   # component docs
 pnpm sync:skill                                      # if the skill changed
 ```
 
@@ -144,9 +144,12 @@ pnpm sync:skill                                      # if the skill changed
 |---|---|---|
 | `repos/slice.js` | `slicejs-web-framework` | Runtime, router, component system, server factory, browser runtime/build. |
 | `repos/slicejs-cli` | `slicejs-cli` | `slice dev/build/start/init/component/...`, bundler, watcher, types. |
-| `repos/slice.js_visual_library` | `slicejs-webframework-visual-components-library` | Official visual/service components, registry, component docs and DOM e2e. |
+| `repos/slicejs-components` | `slicejs-components` | Official visual/service components, registry, component docs and DOM e2e. |
 | `repos/slice.js_docs` | `slicedocs` | Markdown-generated documentation site. |
 | `repos/conclave` | `teams-organizer` | Real production product used as the proving ground. |
+
+> The former `slice.js_visual_library` repository is now **`slicejs-components`** (Slice.js
+> Components), matching `components.slicejs.com`. Old GitHub URLs redirect to the new name.
 
 ## Documentation
 
