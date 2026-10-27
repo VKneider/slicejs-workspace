@@ -10,8 +10,9 @@ specific order, after the local validation described in [`TESTING.md`](./TESTING
 | 1 | `slice.js` | `slicejs-web-framework` | Runtime, server and build contract consumed by everyone. |
 | 2 | `slicejs-cli` | `slicejs-cli` | Dev/build tooling; depends on the framework. |
 | 3 | `slicejs-components` | `slicejs-components` | Components depend on both framework and CLI. |
-| 4 | `slice.js_docs` | not published (Vercel) | Docs depend on the new versions. |
-| 5 | `conclave` | not published (Vercel) | Product consumes the released packages. |
+| 4 | `slicejs-mcp` | `slicejs-mcp` | MCP reads the framework and Components catalogs. |
+| 5 | `slice.js_docs` | not published (Vercel) | Docs depend on the new versions. |
+| 6 | `conclave` | not published (Vercel) | Product consumes the released packages. |
 
 Do not publish a dependent package before its dependency is available on npm.
 
@@ -34,7 +35,8 @@ Run from the workspace root:
 - [ ] `pnpm bootstrap --pull` (or `pnpm sync` + review) — repos on `master`, no unexpected dirt.
 - [ ] `pnpm doctor` — links point at local source; warnings understood.
 - [ ] `pnpm check:skill` — vendored skill matches the docs source.
-- [ ] `pnpm test` — framework + CLI + visual unit suites.
+- [ ] `pnpm test` — framework + CLI + components unit suites.
+- [ ] `pnpm build:mcp` — MCP TypeScript build.
 - [ ] `pnpm verify:conclave` — the product serves the local runtime.
 - [ ] `pnpm test:components:gate` if framework lifecycle/render behavior changed.
 - [ ] `pnpm test:conclave` for product-affecting changes.
@@ -93,6 +95,10 @@ pnpm publish --access public
 
 # Slice.js Components (if changed)
 cd ../slicejs-components
+pnpm publish --access public
+
+# MCP (if changed)
+cd ../slicejs-mcp
 pnpm publish --access public
 ```
 

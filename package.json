@@ -30,6 +30,7 @@
     "dev:framework": "node scripts/framework-cli.mjs dev",
     "build:conclave": "node scripts/run-app-script.mjs conclave build",
     "build:components": "node scripts/run-app-script.mjs slicejs-components build",
+    "build:mcp": "node scripts/run-app-script.mjs slicejs-mcp build",
     "build:framework": "node scripts/framework-cli.mjs build",
     "start:conclave": "node scripts/run-app-script.mjs conclave start",
     "start:framework": "node scripts/framework-cli.mjs start",

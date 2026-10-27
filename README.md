@@ -79,6 +79,8 @@ work.
 | `pnpm test:components:gate` | Full components gate: unit + icons + e2e + build. |
 | `pnpm test:conclave` | Conclave e2e (Playwright, both projects). |
 | `pnpm build:conclave` | Conclave production build (copies the local runtime into `dist/`). |
+| `pnpm build:components` | Builds Slice.js Components. |
+| `pnpm build:mcp` | Builds the local `slicejs-mcp` TypeScript server. |
 | `pnpm start:conclave` | Serve Conclave's production build locally. |
 | `pnpm lint:conclave` | Conclave ESLint. |
 | `pnpm build:framework` | Builds the framework demo with the local CLI. |
@@ -145,7 +147,8 @@ pnpm sync:skill                                      # if the skill changed
 |---|---|---|
 | `repos/slice.js` | `slicejs-web-framework` | Runtime, router, component system, server factory, browser runtime/build. |
 | `repos/slicejs-cli` | `slicejs-cli` | `slice dev/build/start/init/component/...`, bundler, watcher, types. |
-| `repos/slicejs-components` | `slicejs-components` | Official visual/service components, registry, component docs and DOM e2e. |
+| `repos/slicejs-components` | `slicejs-components` | Slice.js Components: official visual/service components, registry, component docs and DOM e2e. |
+| `repos/slicejs-mcp` | `slicejs-mcp` | MCP server exposing the framework and Components documentation catalogs. |
 | `repos/slice.js_docs` | `slicedocs` | Markdown-generated documentation site. |
 | `repos/conclave` | `teams-organizer` | Real production product used as the proving ground. |
 

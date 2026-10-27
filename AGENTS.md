@@ -54,6 +54,7 @@ Only when the task needs it:
 | Conclave architecture/data/features/design | `repos/conclave/docs/ARCHITECTURE.md`, `DATA.md`, `FEATURES.md`, `DESIGN.md` |
 | Conclave pitfalls (42 numbered gotchas) | `repos/conclave/docs/GOTCHAS.md` |
 | Docs site content | `repos/slice.js_docs/AGENTS.md`, `repos/slice.js_docs/markdown/` |
+| MCP server / catalogs | `repos/slicejs-mcp/README.md`, `repos/slicejs-mcp/src/catalogs.ts` |
 | Documentation policy and framework→docs mapping | `docs/DOCUMENTATION.md` |
 | Skill guidance / vendored skill | `repos/slice.js_docs/skill/slice-js-developer/`, `.opencode/skills/slice-js-developer/` |
 | Release / compatibility | `docs/RELEASE.md` |
@@ -94,6 +95,8 @@ pnpm test:conclave         # Conclave Playwright e2e (both projects)
 pnpm lint:conclave
 pnpm build:conclave
 pnpm start:conclave
+pnpm build:components
+pnpm build:mcp
 pnpm build:framework
 pnpm test                  # framework + CLI + components unit suites (no e2e)
 

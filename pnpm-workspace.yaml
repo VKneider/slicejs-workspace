@@ -19,3 +19,5 @@ overrides:
 # needs its postinstall to verify the platform binary.
 allowBuilds:
   esbuild: true
+  # Transitive dependency of the MCP server; its install script is not needed.
+  tldjs: false

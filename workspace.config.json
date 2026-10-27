@@ -30,6 +30,15 @@
       "required": true
     },
     {
+      "dir": "slicejs-mcp",
+      "name": "slicejs-mcp",
+      "package": "slicejs-mcp",
+      "role": "mcp",
+      "remote": "https://github.com/VKneider/slicejs-mcp.git",
+      "branch": "master",
+      "required": true
+    },
+    {
       "dir": "slice.js_docs",
       "name": "slice.js_docs",
       "package": "slicedocs",

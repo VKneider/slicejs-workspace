@@ -29,6 +29,7 @@ There is no `npm publish` in the inner loop, no manual copy into the pnpm store 
 | `repos/slice.js` | `slicejs-web-framework` | 4.0.2 | Framework runtime + `api/framework` + demo app | `vkneider/slice.js` |
 | `repos/slicejs-cli` | `slicejs-cli` | 4.3.0 | CLI: dev server, build, init, components, types | `vkneider/slicejs-cli` |
 | `repos/slicejs-components` | `slicejs-components` | 2.0.0 | Slice.js Components: official visual/service components, registry, component docs and DOM e2e | `VKneider/slicejs-components` |
+| `repos/slicejs-mcp` | `slicejs-mcp` | 1.2.1 | MCP server exposing the framework and Components documentation catalogs | `VKneider/slicejs-mcp` |
 | `repos/slice.js_docs` | `slicedocs` | 3.8.0 | Markdown-generated documentation site | `vkneider/slice.js_docs` |
 | `repos/conclave` | `teams-organizer` | 1.0.0 | Real production product (group decision-making) | `vkneider/conclave` |
 
@@ -41,12 +42,15 @@ graph TD
   FW["slicejs-web-framework<br/>repos/slice.js"]
   CLI["slicejs-cli<br/>repos/slicejs-cli"]
   VL["Slice.js Components<br/>repos/slicejs-components"]
+  MCP["slicejs-mcp<br/>repos/slicejs-mcp"]
   DOCS["slicedocs<br/>repos/slice.js_docs"]
   CON["teams-organizer (Conclave)<br/>repos/conclave"]
 
   CLI --> FW
   VL --> FW
   VL --> CLI
+  MCP --> FW
+  MCP --> VL
   DOCS --> FW
   DOCS --> CLI
   CON --> FW
@@ -119,6 +123,16 @@ serving an old `dist/`, you will not see the change: rebuild.
 - `test:gate` = unit + icon lint + e2e + build. It is the most complete gate in the ecosystem.
 - Key rules: public props with backwards-compatible aliases, exactly one export per module, never
   edit `icons.generated.js`, no domain logic in visual components.
+
+### `slicejs-mcp` — documentation MCP
+
+- stdio MCP server exposing two catalogs: `framework` (from `slicejs_docs` `llm.txt`) and
+  `components` (from `slicejs-components/agent/docs-manifest.json`).
+- Tools: `slice_framework_*` and `slice_components_*` for list/search/get.
+- 1.2.1 fixes the default Components URLs after the repository rename; environment overrides
+  (`SLICE_COMPONENTS_MANIFEST_URL`, `SLICE_COMPONENTS_RAW_BASE_URL`) still win.
+- Build with `pnpm build:mcp`; the workspace `opencode.jsonc` configures the MCP server.
+- The MCP caches catalogs in memory; restart it after a manifest change.
 
 ### `slice.js_docs` — documentation
 

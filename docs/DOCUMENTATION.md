@@ -72,9 +72,11 @@ new guide even though `pnpm dev:components` and the local docs build do. If the 
 running, restart it (or reset its cache) after the manifest changes.
 
 > The published `slicejs-mcp@1.2.0` still defaults to the old `slice.js_visual_library` repository.
-> The workspace `opencode.jsonc` overrides `SLICE_COMPONENTS_MANIFEST_URL` and
+> The local `slicejs-mcp` source is updated for `1.2.1`; until that version is published, the
+> workspace `opencode.jsonc` overrides `SLICE_COMPONENTS_MANIFEST_URL` and
 > `SLICE_COMPONENTS_RAW_BASE_URL` to `slicejs-components`. If you run the MCP outside this workspace,
-> set those variables (or update the MCP package) so it sees the renamed repository and the guides.
+> set those variables (or install 1.2.1 once published) so it sees the renamed repository and the
+> guides.
 
 ## 3. Where docs live for each framework area
 

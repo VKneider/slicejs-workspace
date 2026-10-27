@@ -18,6 +18,7 @@ suites that actually validate them. For the end-to-end change strategy (reproduc
 | Conclave full regression | `pnpm test:conclave` | + `pnpm verify:conclave` |
 | Docs content | `pnpm docs:generate` | + `pnpm docs:llm` + `pnpm dev:docs` |
 | Skill guidance | `pnpm check:skill` | + `pnpm sync:skill` after editing the source |
+| MCP server / catalog | `pnpm build:mcp` | + restart MCP and verify list/search/get |
 
 Before any of this, `pnpm doctor` must be green (warnings about version skew are acceptable).
 `pnpm check:skill` must also pass.
@@ -183,7 +184,26 @@ On a clean checkout these commands must leave no diff. Locally, inspect the diff
 docs in `repos/slice.js_docs` (or `repos/slicejs-components`) before calling the change done. Generated
 pages under `src/Components/AppComponents/` are never edited by hand.
 
-## 7. CI shape
+## 7. MCP and catalog checks
+
+The MCP server reads the same `agent/docs-manifest.json` as the CLI:
+
+```bash
+pnpm build:mcp
+```
+
+The workspace `opencode.jsonc` points the MCP at `slicejs-components` through
+`SLICE_COMPONENTS_MANIFEST_URL` and `SLICE_COMPONENTS_RAW_BASE_URL`. The MCP caches catalogs in
+memory, so restart it after changing the manifest. Verify with:
+
+- `slice_components_list_docs` includes the expected doc IDs (including nested IDs such as
+  `guides/data-loading`).
+- `slice_components_search_docs` finds the new page.
+- `slice_components_get_doc` returns its authored Markdown.
+
+`slicejs-mcp@1.2.1` fixes the default URLs; earlier versions need the env overrides above.
+
+## 8. CI shape
 
 A CI job that wants the full picture should:
 
@@ -196,6 +216,7 @@ pnpm test
 pnpm verify:conclave
 pnpm test:conclave        # needs Chromium
 pnpm build:conclave
+pnpm build:mcp
 pnpm docs:generate        # then git -C repos/slice.js_docs diff --exit-code
 pnpm docs:llm             # then git -C repos/slice.js_docs diff --exit-code
 ```
