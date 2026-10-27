@@ -6,8 +6,10 @@ wins (and this file should be updated).
 
 ## 1. Core idea
 
-Slice.js is developed across several independent repositories that are published as npm packages:
-framework, CLI, Slice.js Components, documentation and products. The traditional loop is:
+Slice.js is developed across several independent repositories. Three of them are published as npm
+packages — framework, CLI and MCP — while the component library is consumed from its GitHub
+repository and the docs/products are deployed (see [`docs/RELEASE.md`](docs/RELEASE.md#1-release-order)).
+The traditional loop is:
 
 ```
 edit slice.js -> publish slicejs-web-framework -> bump the product -> install -> test

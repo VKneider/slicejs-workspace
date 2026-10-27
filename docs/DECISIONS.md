@@ -171,3 +171,31 @@ The workspace keeps only workspace/ecosystem features and exposes `pnpm feature:
 **Trade-off:** two artefacts (`BACKLOG.md` and `features/`) must not duplicate each other. The rule is:
 `BACKLOG.md` = one-line index/order; `features/` = the spec for anything that needs detail. The status
 lives in the feature frontmatter; `BACKLOG.md` only links to it.
+
+## ADR-011 — Release gates in CI, publishing stays manual
+
+**Decision:** automate everything around a publish, and keep the publish itself human. Every repo that
+ships a package gets a CI job that checks the artifact and its declared ranges
+(`scripts/release-check.mjs` in the CLI, `scripts/check-pack.mjs` in the framework); the framework repo
+additionally builds and boots Conclave against the candidate source on every PR and weekly.
+Publishing stays a manual `pnpm publish` from the owning repo, driven by `docs/RELEASE.md`.
+
+**Why:**
+
+- The manual flow already drifted: `slicejs-cli@4.3.0` shipped `slicejs-web-framework@^3.5.0` (a 3.x
+  runtime for every new install), the framework sat unpublished for months, tags disagree with the
+  versions, and the framework tarball carried its test suite. None of that is a judgement problem; it
+  is a missing check.
+- Only three packages are published (framework, CLI, MCP). The component library travels with its
+  GitHub repository, so there is no ordered multi-package release to orchestrate — the upside of a
+  full publish pipeline is small next to its cost.
+- A registry install and a linked workspace are different worlds. `pnpm verify:conclave` proves the
+  links; the CI job proves a fresh clone, which is what users get.
+
+**Trade-off:** the checks live in two repos and will drift in wording. The alternative — a workspace
+CI that clones the ecosystem — needs a remote for a repo that deliberately has none.
+
+**Revisit when:** releases become frequent enough that the publish step itself is the bottleneck, or a
+second maintainer needs to release without local context. Then move to tag-triggered publishing with
+OIDC trusted publishing and provenance; never a long-lived npm token.
+

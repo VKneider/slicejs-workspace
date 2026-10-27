@@ -5,16 +5,22 @@ specific order, after the local validation described in [`TESTING.md`](./TESTING
 
 ## 1. Release order
 
+Only three packages are published to npm. Everything else is deployed or consumed from source.
+
 | Order | Repo | Package | Why |
 |---|---|---|---|
-| 1 | `slice.js` | `slicejs-web-framework` | Runtime, server and build contract consumed by everyone. |
-| 2 | `slicejs-cli` | `slicejs-cli` | Dev/build tooling; depends on the framework. |
-| 3 | `slicejs-components` | `slicejs-components` | Components depend on both framework and CLI. |
-| 4 | `slicejs-mcp` | `slicejs-mcp` | MCP reads the framework and Components catalogs. |
-| 5 | `slice.js_docs` | not published (Vercel) | Docs depend on the new versions. |
-| 6 | `conclave` | not published (Vercel) | Product consumes the released packages. |
+| 1 | `slice.js` | `slicejs-web-framework` → npm | Runtime, server and build contract consumed by everyone. |
+| 2 | `slicejs-cli` | `slicejs-cli` → npm | Dev/build tooling; depends on the framework. |
+| 3 | `slicejs-mcp` | `slicejs-mcp` → npm | MCP reads the framework and Components catalogs. |
+| — | `slicejs-components` | **not published** | The component library is consumed from this GitHub repository (`slice get`, `slice sync` download `src/Components/**` from the default branch). It has a version and a CHANGELOG for its own history, but it is not an npm dependency and `pnpm publish` must not be run there. |
+| — | `slice.js_docs` | not published (Vercel) | Docs depend on the new versions. |
+| — | `conclave` | not published (Vercel) | Product consumes the released packages. |
 
 Do not publish a dependent package before its dependency is available on npm.
+
+Because `slicejs-components` is not on npm, a component change ships when it is merged to the
+repository's default branch — there is no publish step, and no way to pin a component version from
+a project. `slice sync` follows the default branch.
 
 ## 2. Compatibility matrix
 
@@ -48,7 +54,15 @@ Run from the workspace root:
 - [ ] Every changed repo has a clean, focused commit and an updated `CHANGELOG.md` per its own
       rules.
 - [ ] Package versions bumped in the repos that will be published.
+- [ ] `node scripts/release-check.mjs` in `repos/slicejs-cli` — packaging, version not already on npm,
+      changelog section, and the framework range accepts the paired version. `--allow-published`
+      skips the version check when running in CI.
+- [ ] `node scripts/check-pack.mjs` in `repos/slice.js` — the tarball contains the runtime, server and
+      SEO module and no tests/proposals/local tooling.
 - [ ] Packed-artifact smoke test (below) for framework/CLI changes.
+
+The CI workflows in `slice.js` and `slicejs-cli` already run the two scripts plus the Conclave
+boot check; the manual smoke test below covers the registry install that CI cannot reproduce.
 
 ## 4. Packed-artifact smoke test
 
@@ -69,16 +83,20 @@ This catches the class of failures that only appear when `node_modules` is a rea
 
 Each repo follows its own rules:
 
-- `slice.js`: SemVer + `CHANGELOG.md`.
+- `slice.js`: SemVer + `CHANGELOG.md`; published to npm.
 - `slicejs-cli`: Keep a Changelog + SemVer; see its `AGENTS.md` for the exact release steps
-  (bump, move `[Unreleased]`, compare links, commit, tag, push, GitHub release).
-- `slicejs-components`: SemVer + `CHANGELOG.md`; public props keep backward-compatible
-  aliases.
+  (bump, move `[Unreleased]`, compare links, commit, tag, push, GitHub release); published to npm.
+- `slicejs-cli`: its declared `slicejs-web-framework` range must accept the version being paired
+  with it (`scripts/release-check.mjs` fails otherwise). A published CLI that resolves an old
+  runtime installs the wrong framework for every new user.
+- `slicejs-mcp`: SemVer + `CHANGELOG.md`; published to npm.
+- `slicejs-components`: SemVer + `CHANGELOG.md` for its own history; public props keep
+  backward-compatible aliases. **Not published to npm** — see §1.
 - `slice.js_docs`: deploy-only; no npm package.
 - `conclave`: deploy-only; no npm package.
 
-Breaking framework changes require a major bump and a coordinated release of CLI, Slice.js Components
-and products.
+Breaking framework changes require a major bump and a coordinated release of the CLI and of the
+products; the component library travels with its repository, not with a version number.
 
 ## 6. Publishing commands
 
@@ -93,14 +111,14 @@ pnpm publish --access public
 cd ../slicejs-cli
 pnpm publish --access public
 
-# Slice.js Components (if changed)
-cd ../slicejs-components
-pnpm publish --access public
-
 # MCP (if changed)
 cd ../slicejs-mcp
 pnpm publish --access public
 ```
+
+`repos/slicejs-components` is **not** in this list: it is not an npm package. Its changes reach users
+through the repository (the CLI downloads component files from GitHub), so it only needs a commit and
+a push.
 
 Then tag/push each repo according to its own changelog instructions. Do **not** tag from
 `slice-workspace`; this repo has no release.

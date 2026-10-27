@@ -205,7 +205,16 @@ memory, so restart it after changing the manifest. Verify with:
 
 ## 8. CI shape
 
-A CI job that wants the full picture should:
+CI runs per repo, because each one is an independent repository. What exists today:
+
+| Repo | Workflow | Covers |
+|---|---|---|
+| `slice.js` | `ci.yml` | Runtime/server/SEO tests, `scripts/check-pack.mjs`, and a **Conclave job**: fresh clone, install, `scripts/verify-app.mjs --replace` (build with the app's own CLI, boot, assert `/Slice/Slice.js` is the candidate source). Runs on PR, push and weekly. |
+| `slicejs-cli` | `ci.yml` | Unit/integration tests, Playwright e2e, `scripts/release-check.mjs --allow-published`. |
+| `slicejs-components` | `component-tests.yml` | Logic tests, icons lint, Playwright e2e, build. |
+| `slice.js_docs` | `docs-render-cicd.yml` | Docs render + `slice seo sitemap` / `seo check` (gated on a framework with the SEO module). |
+
+The workspace itself has no remote and no CI. When you need the full local picture:
 
 ```bash
 pnpm bootstrap --no-install
@@ -221,5 +230,6 @@ pnpm docs:generate        # then git -C repos/slice.js_docs diff --exit-code
 pnpm docs:llm             # then git -C repos/slice.js_docs diff --exit-code
 ```
 
-The workspace repo itself does not ship CI that clones the private/public ecosystem; wire this into
-your pipeline if you want it automated.
+`pnpm verify:conclave` proves the *linked* workspace; the CI job proves a *fresh clone*, which is
+the combination users actually install.
+
