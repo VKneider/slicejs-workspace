@@ -16,9 +16,11 @@ suites that actually validate them. For the end-to-end change strategy (reproduc
 | Visual library full gate | `pnpm test:visual:gate` | — |
 | Conclave UI / domain | `pnpm lint:conclave` | + affected specs + `pnpm build:conclave` |
 | Conclave full regression | `pnpm test:conclave` | + `pnpm verify:conclave` |
-| Docs content | `docs:generate` in the docs repo | + `pnpm dev:docs` |
+| Docs content | `pnpm docs:generate` | + `pnpm docs:llm` + `pnpm dev:docs` |
+| Skill guidance | `pnpm check:skill` | + `pnpm sync:skill` after editing the source |
 
 Before any of this, `pnpm doctor` must be green (warnings about version skew are acceptable).
+`pnpm check:skill` must also pass.
 
 ## 2. Suites in detail
 
@@ -165,7 +167,23 @@ If an HTML report fails with `EACCES`, use `--reporter=line` or point
 - **Flaky drag/touch spec**: synthetic events skip actionability checks; wait for the
   `slice-loading` overlay to detach (GOTCHAS §42).
 
-## 6. CI shape
+## 6. Documentation and skill checks
+
+Documentation has contracts too (see [`DOCUMENTATION.md`](./DOCUMENTATION.md)):
+
+```bash
+pnpm check:skill                 # vendored skill matches repos/slice.js_docs/skill
+pnpm docs:generate               # docs pages/routes regenerate without errors
+pnpm docs:llm                    # llm.txt regenerates
+pnpm docs:lint:visual            # component Markdown contract
+pnpm docs:generate:visual        # component docs regenerate
+```
+
+On a clean checkout these commands must leave no diff. Locally, inspect the diff and commit the
+docs in `repos/slice.js_docs` (or the visual library) before calling the change done. Generated
+pages under `src/Components/AppComponents/` are never edited by hand.
+
+## 7. CI shape
 
 A CI job that wants the full picture should:
 
@@ -173,10 +191,13 @@ A CI job that wants the full picture should:
 pnpm bootstrap --no-install
 pnpm install --frozen-lockfile
 pnpm doctor
+pnpm check:skill
 pnpm test
 pnpm verify:conclave
 pnpm test:conclave        # needs Chromium
 pnpm build:conclave
+pnpm docs:generate        # then git -C repos/slice.js_docs diff --exit-code
+pnpm docs:llm             # then git -C repos/slice.js_docs diff --exit-code
 ```
 
 The workspace repo itself does not ship CI that clones the private/public ecosystem; wire this into

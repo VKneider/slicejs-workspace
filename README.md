@@ -57,6 +57,12 @@ work.
 | `pnpm bootstrap` | Clones missing repos and installs dependencies. `--no-install` skips the install. |
 | `pnpm bootstrap --pull` | Also fetches and fast-forwards clean repos. |
 | `pnpm setup:browsers` | Installs Playwright Chromium for the visual library and Conclave. |
+| `pnpm sync:skill` | Copies the canonical `slice-js-developer` skill from the docs repo. |
+| `pnpm check:skill` | Fails if the vendored skill drifted from the docs source. |
+| `pnpm docs:generate` | Regenerates the framework docs pages and routes. |
+| `pnpm docs:llm` | Rebuilds the docs LLM dump (`llm.txt`). |
+| `pnpm docs:lint:visual` | Validates the visual library component Markdown. |
+| `pnpm docs:generate:visual` | Regenerates the visual component docs pages. |
 | `pnpm doctor` | Checks repos, branches, `slicejs-web-framework`/`slicejs-cli` resolution and version drift. |
 | `pnpm status` | Aggregated Git status for every repo. |
 | `pnpm sync` | Fetches all remotes and reports ahead/behind. `sync:pull` performs a safe fast-forward. |
@@ -99,6 +105,39 @@ Practical consequences:
 > `repos/conclave` (which has its own `pnpm-workspace.yaml` for pnpm settings) can resolve packages
 > from the registry again and break the direct links. `pnpm doctor` detects that state.
 
+## Bundled Slice.js skill
+
+The workspace vendors the canonical **`slice-js-developer`** skill from
+`repos/slice.js_docs/skill/slice-js-developer` into `.opencode/skills/slice-js-developer`. OpenCode
+loads it automatically, so agents get the Slice.js mental model, decision rules and references
+without network access.
+
+- Current version: **1.11.0** (targets `slicejs-web-framework ^4.0.x`).
+- The docs repo is the source of truth. Edit the skill there, bump `VERSION` and
+  `skill/manifest.json`, then run `pnpm sync:skill`.
+- `pnpm check:skill` and `pnpm doctor` detect drift between the vendored copy and the docs source.
+- Never edit the vendored copy by hand.
+
+`opencode.jsonc` also enables the optional `slicemcp` server for live, authoritative documentation
+queries. The vendored skill remains fully usable offline via its `references/` directory.
+
+## Documentation is part of the change
+
+A framework or CLI change is not complete until its documentation is checked. User-facing changes
+require a docs commit in `repos/slice.js_docs` (or `repos/slice.js_visual_library/src/markdown` for
+component docs). Internal-only changes still require a docs check and a recorded "no docs impact"
+reason.
+
+See [`docs/DOCUMENTATION.md`](./docs/DOCUMENTATION.md) for the mandatory workflow and the mapping
+from framework area to documentation pages. The short version:
+
+```bash
+pnpm docs:generate
+pnpm docs:llm
+pnpm docs:lint:visual && pnpm docs:generate:visual   # component docs
+pnpm sync:skill                                      # if the skill changed
+```
+
 ## Repositories
 
 | Directory | Package | Role |
@@ -114,6 +153,7 @@ Practical consequences:
 - [`CONTEXT.md`](./CONTEXT.md) — how everything fits together, runtime architecture and current state.
 - [`AGENTS.md`](./AGENTS.md) — rules for agents and for any change.
 - [`docs/CHANGE-WORKFLOW.md`](./docs/CHANGE-WORKFLOW.md) — end-to-end strategy for changing the framework or CLI and testing it.
+- [`docs/DOCUMENTATION.md`](./docs/DOCUMENTATION.md) — mandatory docs policy and framework→docs page mapping.
 - [`docs/LOCAL-DEVELOPMENT.md`](./docs/LOCAL-DEVELOPMENT.md) — linking model, recipes and escape hatches.
 - [`docs/TESTING.md`](./docs/TESTING.md) — test matrix and what to run for each change.
 - [`docs/RELEASE.md`](./docs/RELEASE.md) — release order, versioning and compatibility.

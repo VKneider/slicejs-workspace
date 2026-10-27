@@ -97,3 +97,39 @@ published" and "patch the pnpm store").
 
 **Trade-off:** two documents can disagree. `AGENTS.md` §6 lists the known obsolete statements; when
 updating a subrepo doc, keep the standalone context in mind.
+
+## ADR-007 — Vendor the skill, keep docs as the source of truth
+
+**Decision:** commit the canonical `slice-js-developer` skill from
+`repos/slice.js_docs/skill/slice-js-developer` into `.opencode/skills/slice-js-developer`, with a
+sync script and a doctor/check parity check.
+
+**Why:**
+
+- OpenCode loads project skills from `.opencode/skills` automatically; agents get the Slice.js
+  mental model without relying on an MCP or network.
+- The docs repo already publishes and versions the skill; keeping the canonical source there avoids
+  a second authoring location.
+- A vendored copy is inspectable, diffable and available offline.
+- The sync/check commands prevent the copy from silently drifting.
+
+**Trade-off:** two copies exist. They must be synced with `pnpm sync:skill` and the version bumped
+in the docs repo; `pnpm doctor` / `pnpm check:skill` fail on drift.
+
+## ADR-008 — Documentation is a gate, not a follow-up
+
+**Decision:** every change needs a documentation decision. User-facing framework/CLI/component
+changes require a docs commit in the owning docs repo; internal-only changes require a recorded
+"no docs impact" reason. Framework changes must be checked against the page map in
+`docs/DOCUMENTATION.md`.
+
+**Why:**
+
+- Local linking makes code changes easy; without a docs gate the published documentation drifts
+  faster than before.
+- The skill and generated docs are easy to forget; making them part of the definition of done keeps
+  agents and humans aligned.
+- Docs are versioned with code, so a behavior change and its explanation should land together.
+
+**Trade-off:** small internal changes still pay a short docs-check cost. That is intentional: the
+check is cheap, and the recorded decision prevents silent documentation debt.

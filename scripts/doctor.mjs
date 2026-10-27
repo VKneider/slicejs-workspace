@@ -44,6 +44,22 @@ function sha256(filePath) {
   return createHash('sha256').update(readFileSync(filePath)).digest('hex');
 }
 
+function parseSkillVersion(filePath) {
+  try {
+    const text = readFileSync(filePath, 'utf8');
+    const version = text.match(/^version:\s*(.+)$/m)?.[1]?.trim();
+    const targets = text.match(/^targets:\s*(.+)$/m)?.[1]?.trim();
+    return { version, targets };
+  } catch {
+    return null;
+  }
+}
+
+function majorOf(value) {
+  const match = String(value || '').match(/(\d+)/);
+  return match ? Number(match[1]) : null;
+}
+
 function checkEnvironment() {
   log.step('Environment');
 
@@ -263,11 +279,75 @@ function checkSelfLinks() {
   }
 }
 
+function checkSkill() {
+  log.step('Slice.js developer skill');
+
+  const vendoredDir = join(ROOT, '.opencode', 'skills', 'slice-js-developer');
+  const vendoredPath = join(vendoredDir, 'VERSION');
+  if (!existsSync(join(vendoredDir, 'SKILL.md')) || !existsSync(vendoredPath)) {
+    error(
+      `.opencode/skills/slice-js-developer is missing SKILL.md or VERSION. Run pnpm sync:skill (the vendored copy is required).`,
+    );
+    return;
+  }
+
+  const vendored = parseSkillVersion(vendoredPath);
+  if (!vendored?.version) {
+    error(`Cannot read the vendored skill version from ${vendoredPath}.`);
+    return;
+  }
+  ok(`vendored skill v${vendored.version}${vendored.targets ? ` (targets ${vendored.targets})` : ''}`);
+
+  const fwVersion = localPackageVersion('slice.js');
+  const targetMajor = majorOf(vendored.targets);
+  const frameworkMajor = majorOf(fwVersion);
+  if (targetMajor !== null && frameworkMajor !== null && targetMajor !== frameworkMajor) {
+    warn(
+      `vendored skill targets ${vendored.targets}, but the local framework is ${fwVersion}. ` +
+        'Expect guidance drift; update the skill for the new major.',
+    );
+  }
+
+  const docsSkillDir = join(repoPath('slice.js_docs'), 'skill', 'slice-js-developer');
+  if (!existsSync(docsSkillDir)) {
+    warn('the docs checkout is missing; cannot compare the vendored skill with its canonical source.');
+    return;
+  }
+
+  const source = parseSkillVersion(join(docsSkillDir, 'VERSION'));
+  if (source?.version && source.version !== vendored.version) {
+    warn(
+      `vendored skill v${vendored.version}, docs skill v${source.version}. Run pnpm sync:skill before committing.`,
+    );
+  } else if (source?.version) {
+    ok(`matches the docs skill version (v${source.version})`);
+  }
+
+  const manifest = tryReadJson(join(repoPath('slice.js_docs'), 'skill', 'manifest.json'));
+  if (Array.isArray(manifest?.files)) {
+    const drifted = manifest.files.filter((file) => {
+      const sourceFile = join(docsSkillDir, file);
+      const targetFile = join(vendoredDir, file);
+      if (!existsSync(sourceFile) || !existsSync(targetFile)) return true;
+      return !readFileSync(sourceFile).equals(readFileSync(targetFile));
+    });
+    if (drifted.length > 0) {
+      warn(
+        `${drifted.length} skill file(s) differ from the docs source (${drifted.slice(0, 4).join(', ')}` +
+          `${drifted.length > 4 ? ', …' : ''}). Run pnpm sync:skill.`,
+      );
+    } else {
+      ok('skill files match the docs source');
+    }
+  }
+}
+
 checkEnvironment();
 checkRepos();
 checkLinks();
 checkStaleBuilds();
 checkSelfLinks();
+checkSkill();
 
 log.step('Result');
 if (errors === 0) {

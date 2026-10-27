@@ -114,6 +114,8 @@ serving an old `dist/`, you will not see the change: rebuild.
 - `src/markdown/` + `parser/` generate the component documentation.
 - It is the **real DOM e2e** surface: Playwright mounts components at `/__test` and tests
   lifecycle, destroy, drag & drop and visual regression.
+- Component docs source of truth: `src/markdown/<component>.md`; generated pages are never edited by
+  hand. Run `pnpm docs:lint:visual` + `pnpm docs:generate:visual` after changing a component API.
 - `test:gate` = unit + icon lint + e2e + build. It is the most complete gate in the ecosystem.
 - Key rules: public props with backwards-compatible aliases, exactly one export per module, never
   edit `icons.generated.js`, no domain logic in visual components.
@@ -128,6 +130,9 @@ serving an old `dist/`, you will not see the change: rebuild.
 - The repo is on 3.x and declares framework/CLI 3.x, but the workspace links it against 4.x. It is
   the most likely candidate for incompatibilities; use it for content and, if something breaks,
   record it as upgrade debt (do not force it).
+- It is also the canonical home of the **`slice-js-developer`** skill (`skill/slice-js-developer/`)
+  and of the framework documentation (`markdown/**/*.md`). The workspace vendors the skill into
+  `.opencode/skills/slice-js-developer`; `pnpm sync:skill` keeps them identical.
 
 ### `conclave` — the real product
 
@@ -204,3 +209,19 @@ For a Conclave UI change: lint + build + the affected specs.
   `repos/conclave/docs/COMPONENT-PATTERNS.md`.
 - Real-world pitfalls: `repos/conclave/docs/GOTCHAS.md` (numbered; §32 does not exist).
 - Working contract: root `AGENTS.md`.
+- Documentation policy and page map: `docs/DOCUMENTATION.md`.
+- Agent skill: `.opencode/skills/slice-js-developer` (canonical source:
+  `repos/slice.js_docs/skill/slice-js-developer`; sync with `pnpm sync:skill`).
+
+## 10. Skill and documentation
+
+The workspace ships the `slice-js-developer` skill (v1.11.0, targets framework 4.x) so agents load
+Slice's mental model before writing code. Its canonical source is the docs repo; the vendored copy
+exists for offline OpenCode use. `pnpm check:skill` / `pnpm doctor` report drift.
+
+Documentation is not optional. Every change needs a docs decision: a docs commit for user-facing
+behavior, or a recorded reason for no docs impact. Framework changes must be checked against the
+matching pages in `repos/slice.js_docs/markdown/`; component changes against
+`repos/slice.js_visual_library/src/markdown/`; skill guidance changes against the skill source +
+`VERSION` + `skill/manifest.json`. The full policy, mapping and commands live in
+[`docs/DOCUMENTATION.md`](./docs/DOCUMENTATION.md).

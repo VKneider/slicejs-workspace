@@ -33,11 +33,16 @@ Run from the workspace root:
 
 - [ ] `pnpm bootstrap --pull` (or `pnpm sync` + review) — repos on `master`, no unexpected dirt.
 - [ ] `pnpm doctor` — links point at local source; warnings understood.
+- [ ] `pnpm check:skill` — vendored skill matches the docs source.
 - [ ] `pnpm test` — framework + CLI + visual unit suites.
 - [ ] `pnpm verify:conclave` — the product serves the local runtime.
 - [ ] `pnpm test:visual:gate` if framework lifecycle/render behavior changed.
 - [ ] `pnpm test:conclave` for product-affecting changes.
 - [ ] `pnpm lint:conclave && pnpm build:conclave`.
+- [ ] Docs updated for every user-facing change; `pnpm docs:generate` and `pnpm docs:llm` ran;
+      docs commit exists in `repos/slice.js_docs` (or the visual library for component docs).
+- [ ] If agent guidance changed: skill version bumped in the docs repo and `pnpm sync:skill` run;
+      the synced skill is committed here.
 - [ ] Every changed repo has a clean, focused commit and an updated `CHANGELOG.md` per its own
       rules.
 - [ ] Package versions bumped in the repos that will be published.

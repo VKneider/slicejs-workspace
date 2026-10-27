@@ -19,6 +19,10 @@ is the recipe to follow.
    `repos/slicejs-cli`. Test-only updates in consumers are separate commits.
 6. **Never publish in the inner loop.** Local links replace npm. Publishing is a release activity,
    not a testing step.
+7. **Documentation is part of the change.** Every change needs a docs decision. User-facing changes
+   require a docs commit in `repos/slice.js_docs` (or the visual library for component docs);
+   internal-only changes must record why no docs change was needed. See
+   [`DOCUMENTATION.md`](./DOCUMENTATION.md).
 
 ## 2. The test ladder
 
@@ -52,10 +56,17 @@ pnpm setup:browsers
 | Init/scaffold, component registry | `repos/slicejs-cli/commands/init/`, `getComponent/`, `createComponent/` | `pnpm test:cli` + scratch project |
 | Types generation | `repos/slicejs-cli/commands/types/` | `pnpm test:cli` + `slice:types` in a consumer |
 | Official components | `repos/slice.js_visual_library/` | `pnpm test:visual` + targeted e2e + `pnpm build:visual` |
-| Docs content | `repos/slice.js_docs/markdown/` | `docs:generate` + `pnpm dev:docs` |
+| Component docs | `repos/slice.js_visual_library/src/markdown/` | `pnpm docs:lint:visual` + `pnpm docs:generate:visual` |
+| Docs content | `repos/slice.js_docs/markdown/` | `pnpm docs:generate` + `pnpm docs:llm` + `pnpm dev:docs` |
+| Skill guidance | `repos/slice.js_docs/skill/slice-js-developer/` | edit source + bump version + `pnpm sync:skill` + `pnpm check:skill` |
 
 If a change spans repos, implement in dependency order (framework → CLI → visual → product) and
 commit each repo separately.
+
+Load the **`slice-js-developer`** skill for any Slice.js framework/app code task. It is vendored at
+`.opencode/skills/slice-js-developer` (v1.11.0) from `repos/slice.js_docs/skill/`. If the change
+alters guidance an agent relies on, update the skill source, bump its version, and run
+`pnpm sync:skill`.
 
 ## 4. Framework change playbook
 
@@ -69,6 +80,8 @@ commit each repo separately.
    - `repos/conclave/docs/GOTCHAS.md` when the bug touches a known area.
 5. Decide whether this changes a public contract. If yes, plan the compatibility/major-version
    impact before writing code (see `docs/RELEASE.md`).
+6. Load the `slice-js-developer` skill and read the relevant framework docs from
+   [`DOCUMENTATION.md`](./DOCUMENTATION.md).
 
 ### Phase 1 — Write the failing test
 
@@ -131,12 +144,32 @@ The test must fail for the right reason before the fix.
 Known flakes: the Conclave touch drag-and-drop specs and the QR canvas assertion can fail under the
 full parallel run. Rerun the single spec before calling it a regression.
 
-### Phase 5 — Commit and close
+### Phase 5 — Documentation pass
+
+1. Use [`DOCUMENTATION.md`](./DOCUMENTATION.md) to find the pages for the area you touched.
+2. Update the Markdown source (never generated pages).
+3. Run:
+   ```bash
+   pnpm docs:generate
+   pnpm docs:llm          # when the page belongs to the LLM corpus
+   pnpm dev:docs          # preview, when the docs app runs
+   ```
+4. If the change alters agent guidance, update
+   `repos/slice.js_docs/skill/slice-js-developer/`, bump `VERSION`/`skill/manifest.json`, then run:
+   ```bash
+   pnpm sync:skill
+   pnpm check:skill
+   ```
+5. Record the docs decision in the task/commit. If there is no user-facing impact, say why.
+
+### Phase 6 — Commit and close
 
 1. Commit in `repos/slice.js` (framework + unit test).
 2. If you added/changed a DOM test, commit in `repos/slice.js_visual_library`.
-3. If you added a product regression test, commit in `repos/conclave`.
-4. Update `CHANGELOG.md` only when preparing a release, following that repo's rules.
+3. Commit the docs in `repos/slice.js_docs` (or the visual library for component docs).
+4. If you added a product regression test, commit in `repos/conclave`.
+5. Commit the synced skill in this workspace.
+6. Update `CHANGELOG.md` only when preparing a release, following that repo's rules.
 
 ### Framework acceptance checklist
 
@@ -146,6 +179,8 @@ full parallel run. Rerun the single spec before calling it a regression.
 - [ ] `pnpm verify:conclave` passes.
 - [ ] Build/server changes pass `pnpm build:conclave` (and `pnpm start:conclave` when serving).
 - [ ] `pnpm doctor` is green.
+- [ ] Docs decision recorded; matching framework pages updated; `pnpm docs:generate` ran.
+- [ ] Skill updated + `pnpm sync:skill` if guidance changed.
 - [ ] Commit lives in the owning repo; no generated files or `node_modules` changes.
 
 ## 5. CLI change playbook
@@ -224,6 +259,22 @@ git -C repos/conclave status --short   # inspect generated type changes
 For init/scaffold changes, create a disposable project outside the repos (or under the temp dir),
 run `init`, then `dev`/`build`, and delete it. Do not scaffold inside `repos/`.
 
+### Phase 5 — Documentation pass
+
+1. Update the CLI pages: `markdown/cli-commands.md` and/or
+   `markdown/getting-started/development-workflow.md` (add or change flags, behavior, output).
+2. Run `pnpm docs:generate` and `pnpm docs:llm`.
+3. If the CLI guidance in the skill changed (`references/config-theming-cli.md` or SKILL.md), update
+   `repos/slice.js_docs/skill/slice-js-developer/`, bump its version/manifest, and run
+   `pnpm sync:skill`.
+4. Record the docs decision.
+
+### Phase 6 — Commit
+
+1. Commit in `repos/slicejs-cli`.
+2. Commit the docs in `repos/slice.js_docs`.
+3. Commit the synced skill in this workspace if it changed.
+
 CLI acceptance checklist:
 
 - [ ] Contract/unit test added or updated.
@@ -231,8 +282,10 @@ CLI acceptance checklist:
 - [ ] The affected command was run against the framework demo and/or Conclave.
 - [ ] Dev-server changes went through `pnpm verify:conclave`.
 - [ ] Build/bundler changes went through `pnpm build:framework` and `pnpm build:conclave`.
+- [ ] CLI docs updated; `pnpm docs:generate` / `pnpm docs:llm` ran.
+- [ ] Skill updated + `pnpm sync:skill` if CLI guidance changed.
 - [ ] No generated files or unrelated diffs were committed.
-- [ ] Commit lives in `repos/slicejs-cli`.
+- [ ] Commit lives in `repos/slicejs-cli`; docs commit lives in `repos/slice.js_docs`.
 
 ## 6. Targeted command cheat sheet
 
@@ -266,6 +319,14 @@ pnpm test:conclave
 pnpm lint:conclave
 pnpm build:conclave
 pnpm start:conclave
+
+# Documentation and skill
+pnpm docs:generate
+pnpm docs:llm
+pnpm docs:lint:visual
+pnpm docs:generate:visual
+pnpm sync:skill
+pnpm check:skill
 ```
 
 ## 7. Triage order when something fails
@@ -283,14 +344,15 @@ See [`TROUBLESHOOTING.md`](./TROUBLESHOOTING.md) for symptoms and fixes.
 
 | Change | Minimum evidence |
 |---|---|
-| Framework runtime (no DOM) | framework unit test + `verify:conclave` + green `doctor` |
-| Framework DOM/lifecycle | framework unit + visual e2e + `verify:conclave` |
-| Framework server/router | framework unit + `verify:conclave` + `build:conclave` |
-| Framework build contract | framework unit + `build:framework` + `build:conclave` |
-| CLI wiring | CLI contract test + the command actually runs |
-| CLI dev server | CLI test + `dev:framework` + `verify:conclave` |
-| CLI build/bundler | CLI test + both builds + product start |
-| Visual component | unit + affected e2e + `build:visual` |
+| Framework runtime (no DOM) | framework unit test + `verify:conclave` + docs update + green `doctor` |
+| Framework DOM/lifecycle | framework unit + visual e2e + `verify:conclave` + docs update |
+| Framework server/router | framework unit + `verify:conclave` + `build:conclave` + docs update |
+| Framework build contract | framework unit + `build:framework` + `build:conclave` + docs update |
+| CLI wiring | CLI contract test + the command actually runs + CLI docs update |
+| CLI dev server | CLI test + `dev:framework` + `verify:conclave` + docs update |
+| CLI build/bundler | CLI test + both builds + product start + docs update |
+| Visual component | unit + affected e2e + `build:visual` + component Markdown update |
+| Skill guidance | skill source updated + version bumped + `pnpm sync:skill` + `pnpm check:skill` |
 | Release | full pre-release checklist in `RELEASE.md`, including the packed artifact |
 
 If a required level is skipped, record why in the commit/task. "It works on my machine" is not
