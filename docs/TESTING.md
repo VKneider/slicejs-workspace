@@ -216,8 +216,8 @@ CI runs per repo, because each one is an independent repository. What exists tod
 
 | Repo | Workflow | Covers |
 |---|---|---|
-| `slice.js` | `ci.yml` | Runtime/server/SEO tests, `scripts/check-pack.mjs`, and a **Conclave job**: fresh clone, install, `scripts/verify-app.mjs --replace` (build with the app's own CLI, boot, assert `/Slice/Slice.js` is the candidate source). Runs on PR, push and weekly. |
-| `slicejs-cli` | `ci.yml` | Unit/integration tests, Playwright e2e, `scripts/release-check.mjs --allow-published`. |
+| `slice.js` | `ci.yml` | Runtime/server/SEO tests, `scripts/check-pack.mjs`, a **Conclave job** (fresh clone, install, `scripts/verify-app.mjs --replace`: build, boot, assert `/Slice/Slice.js` is the candidate) and a **template job** (packs the candidate, scaffolds a project with the CLI, swaps the tarball in, then builds/boots/renders in Chromium). Runs on PR, push and weekly. |
+| `slicejs-cli` | `ci.yml` | Unit/integration tests, the template contract (`SLICE_INIT_E2E=1`), Playwright e2e, `scripts/release-check.mjs --allow-published`. |
 | `slicejs-components` | `component-tests.yml` | Logic tests, icons lint, Playwright e2e, build. |
 | `slice.js_docs` | `docs-render-cicd.yml` | Docs render + `slice seo sitemap` / `seo check` (gated on a framework with the SEO module). |
 

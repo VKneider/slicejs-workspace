@@ -79,6 +79,13 @@ The workspace links source; npm will install tarballs. Validate the artifact, no
 This catches the class of failures that only appear when `node_modules` is a real registry install
 (serverless/Vercel, symlink tracing, missing files in the package `files` array).
 
+**Automated for the framework:** the `template` job in `slice.js` packs the candidate, scaffolds a
+project with the CLI, installs the tarball over the published framework, re-applies its template and
+then builds, boots and renders it in Chromium (starter navbar, home section, `NotFound` on an unknown
+URL, no `not found in components.js`). It runs on every PR, so a template that compiles but renders
+nothing no longer reaches a release. The manual steps above stay for the CLI tarball and for validating
+a package already on the registry.
+
 ## 5. Versioning
 
 Each repo follows its own rules:
