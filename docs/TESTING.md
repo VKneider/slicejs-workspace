@@ -55,6 +55,13 @@ symlink requires **Developer Mode** (or an elevated shell). Without it the suite
 link failure; `pnpm doctor` detects it. Enable Developer Mode (Settings → Privacy & security → For
 developers) or run the suite elevated.
 
+**Template contract (`tests/init-e2e.test.js`):** opt-in locally with `SLICE_INIT_E2E=1`, always on in
+CI. It runs a real `slice init` (network: npm + GitHub), builds the scaffolded project with the CLI
+under test, boots its server, and renders it in Chromium: the starter navbar and home section must
+exist, an unknown URL must render `NotFound`, and no `not found in components.js` error may appear.
+That is the only check that proves the template works with the components init downloads from the
+registry — a starter that builds but renders nothing passes everything else.
+
 ### `pnpm test:components`
 
 Runs Slice.js Components unit/parser suite (`node --test` with the path-resolution hook).
