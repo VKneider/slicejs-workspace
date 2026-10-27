@@ -101,7 +101,8 @@ pnpm test                  # framework + CLI + components unit suites (no e2e)
 pnpm docs:generate         # framework docs pages + routes
 pnpm docs:llm              # rebuild the docs LLM dump
 pnpm docs:lint:components  # component Markdown contract
-pnpm docs:generate:components # component docs pages
+pnpm docs:generate:components # component pages/routes + agent manifest
+pnpm docs:agent:components  # agent manifest only
 ```
 
 `pnpm test:conclave` runs both projects (`components` and `visual`). Filtering with

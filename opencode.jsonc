@@ -4,7 +4,11 @@
     "servers": {
       "slicemcp": {
         "type": "local",
-        "command": ["npx", "-y", "slicejs-mcp"]
+        "command": ["npx", "-y", "slicejs-mcp"],
+        "environment": {
+          "SLICE_COMPONENTS_MANIFEST_URL": "https://raw.githubusercontent.com/VKneider/slicejs-components/master/agent/docs-manifest.json",
+          "SLICE_COMPONENTS_RAW_BASE_URL": "https://raw.githubusercontent.com/VKneider/slicejs-components"
+        }
       }
     }
   }

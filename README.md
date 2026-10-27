@@ -62,7 +62,8 @@ work.
 | `pnpm docs:generate` | Regenerates the framework docs pages and routes. |
 | `pnpm docs:llm` | Rebuilds the docs LLM dump (`llm.txt`). |
 | `pnpm docs:lint:components` | Validates Slice.js Components component Markdown. |
-| `pnpm docs:generate:components` | Regenerates the component docs pages. |
+| `pnpm docs:generate:components` | Regenerates component docs pages/routes and the agent catalog manifest. |
+| `pnpm docs:agent:components` | Regenerates only the Components agent catalog manifest. |
 | `pnpm doctor` | Checks repos, branches, `slicejs-web-framework`/`slicejs-cli` resolution and version drift. |
 | `pnpm status` | Aggregated Git status for every repo. |
 | `pnpm sync` | Fetches all remotes and reports ahead/behind. `sync:pull` performs a safe fast-forward. |

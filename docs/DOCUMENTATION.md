@@ -33,6 +33,49 @@ until its documentation has been checked and, when behavior changed, updated.
 The skill's canonical copy lives in the docs repo. The workspace copy exists so OpenCode can load it
 offline; `pnpm sync:skill` keeps them identical. `pnpm check:skill` and `pnpm doctor` detect drift.
 
+### Nested docs and guides
+
+The component docs pipeline is recursive. Anything under
+`repos/slicejs-components/src/markdown/**/*.md` is considered, including subfolders such as
+`src/markdown/guides/`. There is no flat-folder assumption in the CLI or MCP: both read
+`agent/docs-manifest.json` and fetch each document's `sourcePath`/`rawUrl`.
+
+A page is included in the CLI/MCP Components catalog only when its frontmatter has both `title` and
+`component`. The manifest generator (`scripts/build-agent-catalog.mjs`) silently skips pages missing
+either field, so a guide can exist on the docs site but be invisible to `slice docs` and the MCP.
+Guides should therefore use the same frontmatter as component pages:
+
+```yaml
+---
+title: Data and the first load
+route: /docs/guides/data-and-loading
+component: DataAndLoadingDocumentation
+generate: true
+---
+```
+
+Nested IDs keep the folder path, for example `guides/data-loading`. CLI and MCP lookup accept that
+exact id, the title, or the qualified id (`components:guides/data-loading`). The generated `kind` is
+`Documentation` unless the component maps to a registered Visual/Service.
+
+Always regenerate both layers after adding or moving docs:
+
+```bash
+pnpm docs:generate:components   # docs pages/routes + agent/docs-manifest.json
+```
+
+`pnpm docs:agent:components` runs only the manifest step when you need it separately.
+
+Remote consumers (the published CLI and MCP) read the committed
+`agent/docs-manifest.json` from GitHub. Until that manifest commit is pushed, they will not see a
+new guide even though `pnpm dev:components` and the local docs build do. If the MCP was already
+running, restart it (or reset its cache) after the manifest changes.
+
+> The published `slicejs-mcp@1.2.0` still defaults to the old `slice.js_visual_library` repository.
+> The workspace `opencode.jsonc` overrides `SLICE_COMPONENTS_MANIFEST_URL` and
+> `SLICE_COMPONENTS_RAW_BASE_URL` to `slicejs-components`. If you run the MCP outside this workspace,
+> set those variables (or update the MCP package) so it sees the renamed repository and the guides.
+
 ## 3. Where docs live for each framework area
 
 | Change area | Framework docs (`repos/slice.js_docs/markdown/`) | Also check |
