@@ -39,7 +39,7 @@
     "start:framework": "node scripts/framework-cli.mjs start",
     "verify:conclave": "node scripts/verify-conclave.mjs",
     "lint:conclave": "node scripts/run-app-script.mjs conclave lint",
-    "test:framework": "node scripts/run-in-repo.mjs slice.js node --test \"Slice/tests/*.test.js\" \"api/framework/*.test.js\" \"api/tests/dev-server-external.test.js\"",
+    "test:framework": "node scripts/run-in-repo.mjs slice.js node --test \"Slice/tests/*.test.js\" \"api/framework/*.test.js\" \"api/tests/*.test.js\"",
     "test:cli": "node scripts/run-app-script.mjs slicejs-cli test",
     "test:components": "node scripts/run-app-script.mjs slicejs-components test",
     "test:components:e2e": "node scripts/run-app-script.mjs slicejs-components test:e2e",
