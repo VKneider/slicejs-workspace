@@ -1,7 +1,8 @@
 # Testing
 
 The workspace is only as useful as the confidence it gives. This page maps change types to the
-suites that actually validate them.
+suites that actually validate them. For the end-to-end change strategy (reproduce → test → implement
+→ product proof), see [`CHANGE-WORKFLOW.md`](./CHANGE-WORKFLOW.md).
 
 ## 1. Quick matrix
 
@@ -134,12 +135,20 @@ build output: review them, do not commit them accidentally, and restore the regi
 
 ## 4. Playwright installation
 
-Browsers are installed once per machine, into the default cache:
+Browsers are installed once per machine:
 
 ```bash
-cd repos/slice.js_visual_library && pnpm exec playwright install chromium
-cd repos/conclave && pnpm exec playwright install chromium
+pnpm setup:browsers
 ```
+
+That script installs Chromium for both e2e surfaces with the right storage model:
+
+- `repos/slice.js_visual_library` sets `PLAYWRIGHT_BROWSERS_PATH=0`, so its browsers live under the
+  workspace `node_modules` and are removed with it.
+- `repos/conclave` uses the machine-level Playwright cache.
+
+Do not run `playwright install` from an arbitrary directory: a plain install without the visual
+library's project-local setting puts the browser where the config will not find it.
 
 If an HTML report fails with `EACCES`, use `--reporter=line` or point
 `PLAYWRIGHT_HTML_REPORT` at a writable directory.

@@ -1,0 +1,297 @@
+# Change workflow — framework and CLI
+
+This is the single end-to-end strategy for changing `slice.js` or `slicejs-cli` and proving the
+change. `AGENTS.md` is the short contract, `docs/TESTING.md` is the suite reference, and this page
+is the recipe to follow.
+
+## 1. Principles
+
+1. **Start from a consumer scenario.** A framework or CLI change exists to fix/improve a real app.
+   Reproduce it in Conclave (production) or the visual library (DOM) before editing.
+2. **Test at the lowest level that can express the bug**, then prove it at the product level.
+   A unit test alone does not prove the dev server serves it; a manual reload alone does not protect
+   the next change.
+3. **Dev is not build.** The dev server transforms on request and can hide bundler errors. Any
+   change in the build/bundler path needs a production build.
+4. **Link sanity before code debugging.** `pnpm doctor` and `pnpm verify:conclave` rule out the
+   workspace before you inspect application code.
+5. **One owner per commit.** Framework changes go to `repos/slice.js`; CLI changes go to
+   `repos/slicejs-cli`. Test-only updates in consumers are separate commits.
+6. **Never publish in the inner loop.** Local links replace npm. Publishing is a release activity,
+   not a testing step.
+
+## 2. The test ladder
+
+Run the lowest level that can fail, then climb only as far as the change warrants.
+
+| Level | Question it answers | Command |
+|---|---|---|
+| 0 — Link | Is the app actually using the local source? | `pnpm doctor` / `pnpm verify:conclave` |
+| 1 — Unit/contract | Does the logic behave correctly in isolation? | `pnpm test:framework` / `pnpm test:cli` |
+| 2 — Integration | Does it work in a real Slice app? | `pnpm dev:framework` / `pnpm dev:conclave` / targeted Playwright |
+| 3 — Product | Did the real product regress? | `pnpm test:conclave`, `pnpm build:conclave`, `pnpm start:conclave` |
+| 4 — Artifact | Does the published package work? | `pnpm pack` + clean install (release only) |
+
+A change is not "tested" because level 2 worked. Pick the levels from the matrices below.
+
+Before running e2e, install the browsers once:
+
+```bash
+pnpm setup:browsers
+```
+
+## 3. Route the change first
+
+| If the change is in... | Edit here | Primary tests |
+|---|---|---|
+| Browser runtime, components, router, lifecycle | `repos/slice.js/Slice/` | `pnpm test:framework` + visual DOM/e2e |
+| Express server, security, env, dev optimizer | `repos/slice.js/api/framework/` | `pnpm test:framework` + `pnpm verify:conclave` + build |
+| CLI command wiring, options, help | `repos/slicejs-cli/client.js` | `pnpm test:cli` + run the command |
+| Dev server, watcher, HMR | `repos/slicejs-cli/commands/startServer/` | `pnpm test:cli` + `pnpm dev:framework` + `pnpm dev:conclave` |
+| Build, bundling, minification | `repos/slicejs-cli/commands/build*/`, `commands/bundle/`, `utils/bundling/` | `pnpm test:cli` + `pnpm build:framework` + `pnpm build:conclave` |
+| Init/scaffold, component registry | `repos/slicejs-cli/commands/init/`, `getComponent/`, `createComponent/` | `pnpm test:cli` + scratch project |
+| Types generation | `repos/slicejs-cli/commands/types/` | `pnpm test:cli` + `slice:types` in a consumer |
+| Official components | `repos/slice.js_visual_library/` | `pnpm test:visual` + targeted e2e + `pnpm build:visual` |
+| Docs content | `repos/slice.js_docs/markdown/` | `docs:generate` + `pnpm dev:docs` |
+
+If a change spans repos, implement in dependency order (framework → CLI → visual → product) and
+commit each repo separately.
+
+## 4. Framework change playbook
+
+### Phase 0 — Reproduce and define
+
+1. `pnpm doctor` (links must be green).
+2. Run the consumer: `pnpm dev:conclave` (product) or `pnpm dev:visual` (DOM/components).
+3. Write down the exact route, component, action and expected/actual result.
+4. Read the relevant invariants first:
+   - `repos/slice.js/AGENTS.md` (destroy model, reserved directives, bare imports).
+   - `repos/conclave/docs/GOTCHAS.md` when the bug touches a known area.
+5. Decide whether this changes a public contract. If yes, plan the compatibility/major-version
+   impact before writing code (see `docs/RELEASE.md`).
+
+### Phase 1 — Write the failing test
+
+- **No DOM:** add a test under `repos/slice.js/Slice/tests/`.
+- **Real DOM/lifecycle:** add a spec under `repos/slice.js_visual_library/` (the framework repo only
+  has node:test).
+- Use the real runtime. For browser-absolute imports, use
+  `Slice/tests/fixtures/real-runtime-loader.mjs`; do not mock the logic under test.
+
+Targeted run:
+
+```bash
+node scripts/run-in-repo.mjs slice.js node --test "Slice/tests/<file>.test.js"
+```
+
+The test must fail for the right reason before the fix.
+
+### Phase 2 — Implement
+
+- Runtime: `repos/slice.js/Slice/` — plain ESM, no build step, no new runtime dependency.
+- Server: `repos/slice.js/api/framework/` — keep the factory contract (`createSliceServer`).
+- Respect reserved directives (`id`, `sliceId`, `singleton`), the destroy cascade and the
+  `childrenIndex` semantics.
+- Do not edit generated files or `node_modules`.
+
+### Phase 3 — Climb the ladder
+
+| Touched area | Commands |
+|---|---|
+| Runtime, no DOM | `pnpm test:framework` → `pnpm verify:conclave` |
+| Lifecycle/DOM | `pnpm test:framework` → `pnpm test:visual:e2e -- <spec>` → `pnpm verify:conclave` |
+| Router/loading | `pnpm test:framework` → affected Conclave navigation spec → `pnpm verify:conclave` |
+| Server/security/env | `pnpm test:framework` → `pnpm verify:conclave` → `pnpm build:conclave` → `pnpm start:conclave` |
+| Build/runtime packaging | `pnpm test:framework` → `pnpm build:framework` → `pnpm build:conclave` |
+
+`pnpm verify:conclave` is mandatory for runtime/server changes: it compares the served
+`/Slice/Slice.js` byte-for-byte with `repos/slice.js/Slice/Slice.js`.
+
+### Phase 4 — Prove it in the product
+
+1. Run the affected Conclave spec:
+   ```bash
+   pnpm test:conclave -- src/Components/<Area>/<Spec>.spec.js
+   ```
+2. For broad/runtime changes, run the full suite:
+   ```bash
+   pnpm test:conclave
+   ```
+3. For product-affecting changes:
+   ```bash
+   pnpm lint:conclave
+   pnpm build:conclave
+   ```
+4. If the change affects production serving, smoke it:
+   ```bash
+   pnpm start:conclave
+   # check / and /Slice/Slice.js, then stop it
+   ```
+
+Known flakes: the Conclave touch drag-and-drop specs and the QR canvas assertion can fail under the
+full parallel run. Rerun the single spec before calling it a regression.
+
+### Phase 5 — Commit and close
+
+1. Commit in `repos/slice.js` (framework + unit test).
+2. If you added/changed a DOM test, commit in `repos/slice.js_visual_library`.
+3. If you added a product regression test, commit in `repos/conclave`.
+4. Update `CHANGELOG.md` only when preparing a release, following that repo's rules.
+
+### Framework acceptance checklist
+
+- [ ] A failing test existed first (or a documented reason it cannot exist).
+- [ ] `pnpm test:framework` passes.
+- [ ] DOM/lifecycle changes have browser coverage and the affected spec passes.
+- [ ] `pnpm verify:conclave` passes.
+- [ ] Build/server changes pass `pnpm build:conclave` (and `pnpm start:conclave` when serving).
+- [ ] `pnpm doctor` is green.
+- [ ] Commit lives in the owning repo; no generated files or `node_modules` changes.
+
+## 5. CLI change playbook
+
+The CLI can break tools without failing a unit test. Always exercise the affected command against a
+real app.
+
+### Phase 0 — Classify the surface
+
+| Surface | Examples | Extra proof required |
+|---|---|---|
+| Command wiring | options, aliases, help, exit codes | run the command |
+| Dev server/watcher | HMR, port resolution, static serving | `dev:framework` + `dev:conclave` |
+| Build/bundler | bundles, externals, minify, runtime copy | `build:framework` + `build:conclave` |
+| Init/scaffold | project structure, registry, starter components | scratch project |
+| Types | `.d.ts` generation | generate in a consumer and inspect |
+| Update/version | notifications, delegation | run against a local project |
+
+### Phase 1 — Test first
+
+Add or extend a contract/unit test under `repos/slicejs-cli/tests/`.
+
+- Contract tests parse `client.js` and assert command/option wiring.
+- Unit tests use `tests/helpers/setup.js`; temp dirs must be cleaned in `finally`.
+- `INIT_CWD` must be saved/restored by the test.
+
+Targeted run:
+
+```bash
+node scripts/run-in-repo.mjs slicejs-cli node --test "tests/<file>.test.js"
+```
+
+### Phase 2 — Implement
+
+- `client.js` for command registration/wiring.
+- `commands/` for behavior.
+- Use `PathHelper`; pass `import.meta.url` where required.
+- No `eval`, ESM only, contextual error messages via `Print`.
+- Do not change dependency specs to local paths.
+
+### Phase 3 — Unit suite
+
+```bash
+pnpm test:cli
+```
+
+**Windows:** this suite creates directory symlinks for temp projects and needs Developer Mode (or
+an elevated shell). Without it, ~36 tests fail with `EPERM ... symlink`. That is an environment
+failure, not a workspace link failure; `pnpm doctor` reports it. Do not "fix" it by editing tests
+unless the task is that fix.
+
+### Phase 4 — Integration proof
+
+Run the narrowest real command plus the affected surface:
+
+```bash
+# command wiring / version / doctor
+node scripts/run-app-script.mjs conclave slice:version
+node scripts/run-app-script.mjs conclave slice:doctor
+
+# dev server, watcher, serving
+pnpm dev:framework
+pnpm dev:conclave
+pnpm verify:conclave
+
+# build/bundler/runtime copy
+pnpm build:framework
+pnpm build:conclave
+pnpm start:conclave
+
+# types
+node scripts/run-app-script.mjs conclave slice:types
+git -C repos/conclave status --short   # inspect generated type changes
+```
+
+For init/scaffold changes, create a disposable project outside the repos (or under the temp dir),
+run `init`, then `dev`/`build`, and delete it. Do not scaffold inside `repos/`.
+
+CLI acceptance checklist:
+
+- [ ] Contract/unit test added or updated.
+- [ ] `pnpm test:cli` passes (or the only failures are the documented Windows symlink ones).
+- [ ] The affected command was run against the framework demo and/or Conclave.
+- [ ] Dev-server changes went through `pnpm verify:conclave`.
+- [ ] Build/bundler changes went through `pnpm build:framework` and `pnpm build:conclave`.
+- [ ] No generated files or unrelated diffs were committed.
+- [ ] Commit lives in `repos/slicejs-cli`.
+
+## 6. Targeted command cheat sheet
+
+```bash
+# Link sanity
+pnpm doctor
+pnpm verify:conclave --verbose
+
+# Framework
+pnpm test:framework
+node scripts/run-in-repo.mjs slice.js node --test "Slice/tests/destroy-cascade.test.js"
+pnpm dev:framework
+pnpm build:framework
+pnpm start:framework
+
+# CLI
+pnpm test:cli
+node scripts/run-in-repo.mjs slicejs-cli node --test "tests/path-helper.test.js"
+node scripts/run-app-script.mjs conclave slice:doctor
+
+# Visual library
+pnpm test:visual
+pnpm test:visual:e2e -- src/Components/Visual/Button/Button.spec.js
+pnpm test:visual:e2e:visual
+pnpm test:visual:gate
+pnpm build:visual
+
+# Conclave (product)
+pnpm test:conclave -- src/Components/Providers/DragDropService/DragDropService.spec.js
+pnpm test:conclave
+pnpm lint:conclave
+pnpm build:conclave
+pnpm start:conclave
+```
+
+## 7. Triage order when something fails
+
+1. `pnpm doctor` — link/store/remote problem?
+2. `pnpm verify:conclave` — is the product serving the local runtime?
+3. Did you run the build? Dev-only success is not enough for bundler/server changes.
+4. Is the failure a known flake? Rerun the single spec.
+5. Is it an environment limitation (Developer Mode, missing Chromium, port busy)?
+6. Only then debug the code path.
+
+See [`TROUBLESHOOTING.md`](./TROUBLESHOOTING.md) for symptoms and fixes.
+
+## 8. Done means
+
+| Change | Minimum evidence |
+|---|---|
+| Framework runtime (no DOM) | framework unit test + `verify:conclave` + green `doctor` |
+| Framework DOM/lifecycle | framework unit + visual e2e + `verify:conclave` |
+| Framework server/router | framework unit + `verify:conclave` + `build:conclave` |
+| Framework build contract | framework unit + `build:framework` + `build:conclave` |
+| CLI wiring | CLI contract test + the command actually runs |
+| CLI dev server | CLI test + `dev:framework` + `verify:conclave` |
+| CLI build/bundler | CLI test + both builds + product start |
+| Visual component | unit + affected e2e + `build:visual` |
+| Release | full pre-release checklist in `RELEASE.md`, including the packed artifact |
+
+If a required level is skipped, record why in the commit/task. "It works on my machine" is not
+evidence.

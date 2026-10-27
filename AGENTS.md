@@ -76,10 +76,12 @@ Tests and builds:
 pnpm test:framework        # node --test Slice/tests
 pnpm test:cli              # node --test
 pnpm test:visual           # unit/parser tests
+pnpm test:visual:e2e       # visual library Playwright specs
 pnpm test:visual:gate      # unit + icons lint + Playwright e2e + build (heavy)
 pnpm test:conclave         # Conclave Playwright e2e (both projects)
 pnpm lint:conclave
 pnpm build:conclave
+pnpm start:conclave
 pnpm build:framework
 pnpm test                  # framework + CLI + visual unit suites (no e2e)
 ```
@@ -89,6 +91,10 @@ pnpm test                  # framework + CLI + visual unit suites (no e2e)
 suite.
 
 ## 4. Change playbook
+
+The full end-to-end strategy — test ladder, targeted commands, acceptance criteria and the CLI
+integration proof — lives in [`docs/CHANGE-WORKFLOW.md`](docs/CHANGE-WORKFLOW.md). The summaries
+below are the short form.
 
 ### A. Framework change (runtime, router, lifecycle, server, build contract)
 

@@ -96,9 +96,12 @@ Get-Process -Id <pid>
 ## 6. Playwright browser missing
 
 ```bash
-cd repos/slice.js_visual_library && pnpm exec playwright install chromium
-cd ../../conclave && pnpm exec playwright install chromium
+pnpm setup:browsers
 ```
+
+That installs Chromium for both the visual library (project-local browsers) and Conclave (machine
+cache). Installing Playwright browsers from an arbitrary directory can put them where the visual
+library's config does not look.
 
 The visual and component projects use Chromium only. Touch specs that construct `TouchEvent` are
 Chromium-specific.

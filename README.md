@@ -23,8 +23,8 @@ slice-workspace/
 - Node.js **>= 20** (the ecosystem targets 20+; this workspace was verified on Node 22).
 - pnpm **11.x** (`corepack enable` or the official installer).
 - Git.
-- Playwright + Chromium only for e2e (`pnpm exec playwright install chromium` inside
-  `repos/slice.js_visual_library` or `repos/conclave`).
+- Playwright + Chromium only for e2e. Install them with `pnpm setup:browsers` (the visual library
+  uses project-local browsers; Conclave uses the machine cache).
 - On Windows, enable **Developer Mode** (or use an elevated shell) for the CLI test suite: some
   tests create directory symlinks and fail with `EPERM` otherwise. `pnpm doctor` reports this.
 
@@ -56,6 +56,7 @@ work.
 |---|---|
 | `pnpm bootstrap` | Clones missing repos and installs dependencies. `--no-install` skips the install. |
 | `pnpm bootstrap --pull` | Also fetches and fast-forwards clean repos. |
+| `pnpm setup:browsers` | Installs Playwright Chromium for the visual library and Conclave. |
 | `pnpm doctor` | Checks repos, branches, `slicejs-web-framework`/`slicejs-cli` resolution and version drift. |
 | `pnpm status` | Aggregated Git status for every repo. |
 | `pnpm sync` | Fetches all remotes and reports ahead/behind. `sync:pull` performs a safe fast-forward. |
@@ -67,9 +68,11 @@ work.
 | `pnpm test:framework` | Framework unit tests (`node --test`). |
 | `pnpm test:cli` | CLI tests (`node --test`). |
 | `pnpm test:visual` | Visual library unit/parser tests. |
+| `pnpm test:visual:e2e` | Visual library Playwright component specs. |
 | `pnpm test:visual:gate` | Full visual gate: unit + icons + e2e + build. |
 | `pnpm test:conclave` | Conclave e2e (Playwright, both projects). |
 | `pnpm build:conclave` | Conclave production build (copies the local runtime into `dist/`). |
+| `pnpm start:conclave` | Serve Conclave's production build locally. |
 | `pnpm lint:conclave` | Conclave ESLint. |
 | `pnpm build:framework` | Builds the framework demo with the local CLI. |
 | `pnpm test` | Framework + CLI + visual unit suites (no e2e). |
@@ -110,6 +113,7 @@ Practical consequences:
 
 - [`CONTEXT.md`](./CONTEXT.md) — how everything fits together, runtime architecture and current state.
 - [`AGENTS.md`](./AGENTS.md) — rules for agents and for any change.
+- [`docs/CHANGE-WORKFLOW.md`](./docs/CHANGE-WORKFLOW.md) — end-to-end strategy for changing the framework or CLI and testing it.
 - [`docs/LOCAL-DEVELOPMENT.md`](./docs/LOCAL-DEVELOPMENT.md) — linking model, recipes and escape hatches.
 - [`docs/TESTING.md`](./docs/TESTING.md) — test matrix and what to run for each change.
 - [`docs/RELEASE.md`](./docs/RELEASE.md) — release order, versioning and compatibility.
