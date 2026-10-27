@@ -14,6 +14,8 @@ slice-workspace/
 ├── workspace.config.json     # repo and link manifest
 ├── pnpm-workspace.yaml       # packages: repos/* + link: overrides
 ├── docs/                     # development, testing, release and troubleshooting guides
+├── features/                 # captured feature proposals (not commitments)
+├── BACKLOG.md                # short ordered workspace/ecosystem backlog
 ├── scripts/                  # bootstrap, doctor, status, sync, verify
 └── repos/                    # individual checkouts (ignored by Git)
 ```
@@ -59,6 +61,8 @@ work.
 | `pnpm setup:browsers` | Installs Playwright Chromium for Slice.js Components and Conclave. |
 | `pnpm sync:skill` | Copies the canonical `slice-js-developer` skill from the docs repo. |
 | `pnpm check:skill` | Fails if the vendored skill drifted from the docs source. |
+| `pnpm feature:new "Title"` | Captures a future feature proposal without implementing it. |
+| `pnpm feature:list` | Lists feature proposals by status/area/repo. |
 | `pnpm docs:generate` | Regenerates the framework docs pages and routes. |
 | `pnpm docs:llm` | Rebuilds the docs LLM dump (`llm.txt`). |
 | `pnpm docs:lint:components` | Validates Slice.js Components component Markdown. |
@@ -166,6 +170,13 @@ pnpm sync:skill                                      # if the skill changed
 - [`docs/RELEASE.md`](./docs/RELEASE.md) — release order, versioning and compatibility.
 - [`docs/TROUBLESHOOTING.md`](./docs/TROUBLESHOOTING.md) — common symptoms and fixes.
 - [`docs/DECISIONS.md`](./docs/DECISIONS.md) — why the workspace is built this way (short ADRs).
+- [`docs/FEATURES.md`](./docs/FEATURES.md) — the per-repo feature standard, statuses and CLI.
+- [`features/README.md`](./features/README.md) — workspace/ecosystem features only.
+- [`BACKLOG.md`](./BACKLOG.md) — short ordered workspace/ecosystem backlog.
+
+## License
+
+MIT. See [`LICENSE`](./LICENSE).
 
 ## What this repo is not
 

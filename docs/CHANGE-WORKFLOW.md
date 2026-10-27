@@ -23,6 +23,9 @@ is the recipe to follow.
    require a docs commit in `repos/slice.js_docs` (or `repos/slicejs-components` for component docs);
    internal-only changes must record why no docs change was needed. See
    [`DOCUMENTATION.md`](./DOCUMENTATION.md).
+8. **Capture future features; don't build them yet.** If the request is "I want to do this later",
+   write it to the owning repo's [`features/`](../docs/FEATURES.md) with `pnpm feature:new` and stop.
+   A feature file is not approval to implement; wait until it is moved to `planned`/`in-progress`.
 
 ## 2. The test ladder
 

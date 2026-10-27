@@ -224,6 +224,7 @@ For a Conclave UI change: lint + build + the affected specs.
 - Real-world pitfalls: `repos/conclave/docs/GOTCHAS.md` (numbered; §32 does not exist).
 - Working contract: root `AGENTS.md`.
 - Documentation policy and page map: `docs/DOCUMENTATION.md`.
+- Future feature proposals: `docs/FEATURES.md` / `pnpm feature:list`.
 - Agent skill: `.opencode/skills/slice-js-developer` (canonical source:
   `repos/slice.js_docs/skill/slice-js-developer`; sync with `pnpm sync:skill`).
 
@@ -239,3 +240,8 @@ matching pages in `repos/slice.js_docs/markdown/`; component changes against
 `repos/slicejs-components/src/markdown/`; skill guidance changes against the skill source +
 `VERSION` + `skill/manifest.json`. The full policy, mapping and commands live in
 [`docs/DOCUMENTATION.md`](./docs/DOCUMENTATION.md).
+
+Feature proposals live in each repo's `features/` folder (or `BACKLOG.md` for a one-liner) until
+approved. Capturing a feature is not approval to implement it; the file records the problem,
+direction, scope, risks and validation plan so it can be picked up later without losing context.
+The workspace CLI aggregates them with `pnpm feature:list`.

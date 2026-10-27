@@ -152,3 +152,22 @@ name stays **Slice.js Components**, matching `components.slicejs.com`.
 URLs, but the CLI, MCP, docs, skill and workspace URLs were updated explicitly. The package version
 moved to `2.0.0`; the old repository name remains only as a compatibility identifier in historical
 notes and redirects.
+
+## ADR-010 — Per-repo `features/` with a workspace aggregator
+
+**Decision:** feature proposals live in each repo's `features/` folder (one Markdown file per
+feature, `NNNN-slug.md`). `BACKLOG.md` remains the short ordered list and links to the detailed file.
+The workspace keeps only workspace/ecosystem features and exposes `pnpm feature:new` /
+`pnpm feature:list` to create and aggregate across all repos.
+
+**Why:**
+
+- The proposal travels with the code, branch and release it belongs to.
+- Standalone repo contributors can see it without cloning the workspace.
+- A workspace-only backlog drifts as soon as someone works outside the workspace.
+- Structured frontmatter makes the workspace CLI reliable; free-form `BACKLOG.md` alone does not.
+- GitHub Issues can still be the discussion/execution layer; the feature file is the durable record.
+
+**Trade-off:** two artefacts (`BACKLOG.md` and `features/`) must not duplicate each other. The rule is:
+`BACKLOG.md` = one-line index/order; `features/` = the spec for anything that needs detail. The status
+lives in the feature frontmatter; `BACKLOG.md` only links to it.

@@ -30,6 +30,9 @@ then `CONTEXT.md`, then the `AGENTS.md` of the repo that owns the files you are 
    `repos/slice.js_docs`; component changes require `repos/slicejs-components/src/markdown`.
    See [`docs/DOCUMENTATION.md`](docs/DOCUMENTATION.md). A change without a docs check is not done.
 9. `repos/` is gitignored. Never force-add it, vendor it, or copy subrepo code into this repo.
+10. **Capture future features; do not implement them yet.** When the user describes a feature for
+    later, create a feature file with `pnpm feature:new` and wait for explicit approval. Writing a
+    feature down is not approval to build it. See [`docs/FEATURES.md`](docs/FEATURES.md).
 
 ## 2. Read order (and context budget)
 
@@ -56,6 +59,7 @@ Only when the task needs it:
 | Docs site content | `repos/slice.js_docs/AGENTS.md`, `repos/slice.js_docs/markdown/` |
 | MCP server / catalogs | `repos/slicejs-mcp/README.md`, `repos/slicejs-mcp/src/catalogs.ts` |
 | Documentation policy and framework→docs mapping | `docs/DOCUMENTATION.md` |
+| Future feature proposals / roadmap | `docs/FEATURES.md`, `pnpm feature:list` |
 | Skill guidance / vendored skill | `repos/slice.js_docs/skill/slice-js-developer/`, `.opencode/skills/slice-js-developer/` |
 | Release / compatibility | `docs/RELEASE.md` |
 
@@ -73,6 +77,8 @@ pnpm status                # aggregated git status
 pnpm sync                  # fetch all; sync:pull = safe fast-forward only
 pnpm sync:skill            # copy the canonical skill from repos/slice.js_docs
 pnpm check:skill           # fail if the vendored skill drifted
+pnpm feature:new "Title"   # capture a future feature (does not implement it)
+pnpm feature:list          # list features by status/area/repo
 pnpm verify:conclave       # boot Conclave and prove the local runtime is what it serves
 
 pnpm dev:conclave          # Conclave, port 3001 (product)
@@ -117,6 +123,13 @@ suite.
 The full end-to-end strategy — test ladder, targeted commands, acceptance criteria and the CLI
 integration proof — lives in [`docs/CHANGE-WORKFLOW.md`](docs/CHANGE-WORKFLOW.md). The summaries
 below are the short form.
+
+### Feature proposal, not work yet?
+
+If the user is describing something for later, **stop before this playbook**. Capture it with
+`pnpm feature:new "Title" --area framework` and fill in the template. Do not create code, branches
+or commits for it until the user explicitly moves it to `planned`/`in-progress`. See
+[`docs/FEATURES.md`](docs/FEATURES.md) for the lifecycle and promotion checklist.
 
 ### A. Framework change (runtime, router, lifecycle, server, build contract)
 
@@ -243,5 +256,7 @@ A change is done when:
       `repos/slice.js_docs` (or `repos/slicejs-components` for component docs).
 - [ ] `pnpm docs:generate` (and `pnpm docs:llm` when relevant) ran; no generated file was hand-edited.
 - [ ] Skill updated and `pnpm sync:skill` run if guidance changed; `pnpm check:skill` is green.
+- [ ] If this implements a feature: its `status`/`related`/decision log are updated in the owning
+      repo's `features/` folder.
 - [ ] No `node_modules`, `.pnpm`, generated files, or `repos/` content were added to this repo.
 - [ ] Workspace docs updated only if the architecture or workflow actually changed.

@@ -5,6 +5,7 @@
   "description": "Local development workspace for the Slice.js ecosystem. Links the framework, CLI, component library, docs and Conclave against their source trees without publishing to npm.",
   "type": "module",
   "packageManager": "pnpm@11.3.0",
+  "license": "MIT",
   "engines": {
     "node": ">=20"
   },
@@ -18,6 +19,8 @@
     "sync:pull": "node scripts/sync.mjs --pull",
     "sync:skill": "node scripts/sync-skill.mjs",
     "check:skill": "node scripts/sync-skill.mjs --check",
+    "feature:new": "node scripts/feature.mjs new",
+    "feature:list": "node scripts/feature.mjs list",
     "docs:generate": "node scripts/run-app-script.mjs slice.js_docs docs:generate",
     "docs:llm": "node scripts/run-app-script.mjs slice.js_docs docs:llm",
     "docs:generate:components": "node scripts/run-app-script.mjs slicejs-components docs:generate && node scripts/run-app-script.mjs slicejs-components docs:agent",
