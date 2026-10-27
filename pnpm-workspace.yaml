@@ -1,0 +1,21 @@
+# Every checkout under repos/ is a workspace project. That makes pnpm install
+# each repo's dependencies and, more importantly, lets the overrides below
+# replace the registry copies with the local source trees.
+packages:
+  - 'repos/*'
+
+# The core of this workspace: every dependency on these two packages, at any
+# depth of the graph, resolves to the local checkout instead of npm.
+#
+# - `link:` deliberately ignores the declared semver range. That is what allows
+#   testing a local 4.x framework against a package that still declares ^3.x.
+# - Keep the dependency specs in the subrepos untouched (publishable). These
+#   overrides only exist in the workspace.
+overrides:
+  slicejs-web-framework: link:./repos/slice.js
+  slicejs-cli: link:./repos/slicejs-cli
+
+# pnpm 10+ blocks dependency build scripts unless explicitly allowed. esbuild
+# needs its postinstall to verify the platform binary.
+allowBuilds:
+  esbuild: true

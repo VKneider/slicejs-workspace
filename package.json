@@ -1,0 +1,35 @@
+{
+  "name": "slice-workspace",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Local development workspace for the Slice.js ecosystem. Links the framework, CLI, component library, docs and Conclave against their source trees without publishing to npm.",
+  "type": "module",
+  "packageManager": "pnpm@11.3.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "bootstrap": "node scripts/bootstrap.mjs",
+    "bootstrap:no-install": "node scripts/bootstrap.mjs --no-install",
+    "doctor": "node scripts/doctor.mjs",
+    "status": "node scripts/status.mjs",
+    "sync": "node scripts/sync.mjs",
+    "sync:pull": "node scripts/sync.mjs --pull",
+    "install:all": "pnpm install",
+    "dev:conclave": "node scripts/run-app-script.mjs conclave dev",
+    "dev:visual": "node scripts/run-app-script.mjs slice.js_visual_library dev",
+    "dev:docs": "node scripts/run-app-script.mjs slice.js_docs dev",
+    "dev:framework": "node scripts/framework-cli.mjs dev",
+    "build:conclave": "node scripts/run-app-script.mjs conclave build",
+    "build:visual": "node scripts/run-app-script.mjs slice.js_visual_library build",
+    "build:framework": "node scripts/framework-cli.mjs build",
+    "verify:conclave": "node scripts/verify-conclave.mjs",
+    "lint:conclave": "node scripts/run-app-script.mjs conclave lint",
+    "test:framework": "node scripts/run-in-repo.mjs slice.js node --test \"Slice/tests/*.test.js\"",
+    "test:cli": "node scripts/run-app-script.mjs slicejs-cli test",
+    "test:visual": "node scripts/run-app-script.mjs slice.js_visual_library test",
+    "test:visual:gate": "node scripts/run-app-script.mjs slice.js_visual_library test:gate",
+    "test:conclave": "node scripts/run-app-script.mjs conclave test:e2e",
+    "test": "pnpm run test:framework && pnpm run test:cli && pnpm run test:visual"
+  }
+}

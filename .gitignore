@@ -1,0 +1,23 @@
+# The repositories are independent Git checkouts with their own remotes and
+# history. `pnpm bootstrap` restores them; they are never vendored here.
+repos/
+
+node_modules/
+.pnpm-store/
+
+# Local/editor noise
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.tsbuildinfo
+
+# Test/build output from scripts run at the workspace root
+coverage/
+dist/
+playwright-report/
+test-results/

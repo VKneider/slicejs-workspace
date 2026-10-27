@@ -1,0 +1,67 @@
+{
+  "$comment": "Manifest consumed by scripts/bootstrap.mjs, scripts/doctor.mjs and scripts/status.mjs. Keep remotes/branches in sync with .git/config of each checkout.",
+  "reposDir": "repos",
+  "repos": [
+    {
+      "dir": "slice.js",
+      "name": "slice.js",
+      "package": "slicejs-web-framework",
+      "role": "framework",
+      "remote": "https://github.com/vkneider/slice.js.git",
+      "branch": "master",
+      "required": true
+    },
+    {
+      "dir": "slicejs-cli",
+      "name": "slicejs-cli",
+      "package": "slicejs-cli",
+      "role": "cli",
+      "remote": "https://github.com/vkneider/slicejs-cli.git",
+      "branch": "master",
+      "required": true
+    },
+    {
+      "dir": "slice.js_visual_library",
+      "name": "slice.js_visual_library",
+      "package": "slicejs-webframework-visual-components-library",
+      "role": "components",
+      "remote": "https://github.com/VKneider/slice.js_visual_library.git",
+      "branch": "master",
+      "required": true
+    },
+    {
+      "dir": "slice.js_docs",
+      "name": "slice.js_docs",
+      "package": "slicedocs",
+      "role": "docs",
+      "remote": "https://github.com/vkneider/slice.js_docs.git",
+      "branch": "master",
+      "required": false
+    },
+    {
+      "dir": "conclave",
+      "name": "conclave",
+      "package": "teams-organizer",
+      "role": "product",
+      "remote": "https://github.com/vkneider/conclave.git",
+      "branch": "master",
+      "required": true
+    }
+  ],
+  "links": [
+    {
+      "package": "slicejs-web-framework",
+      "dir": "slice.js"
+    },
+    {
+      "package": "slicejs-cli",
+      "dir": "slicejs-cli"
+    }
+  ],
+  "consumers": [
+    "conclave",
+    "slice.js_visual_library",
+    "slice.js_docs",
+    "slicejs-cli"
+  ]
+}
