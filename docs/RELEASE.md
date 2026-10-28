@@ -27,7 +27,8 @@ a project. `slice sync` follows the default branch.
 | Consumer | Framework | CLI | Notes |
 |---|---|---|---|
 | `slicejs-cli` | `^4.0.2` (accepts 4.1.1) | — | 4.4.0 pairs with framework 4.1.1. |
-| Slice.js Components | `^4.0.2` | `^4.3.0` (4.4.0 after refresh) | Lockfile still pins the previous CLI until refreshed. |
+| Slice.js Components | `^4.1.1` | `^4.4.0` | Adopted the published pair; lockfile refreshed. |
+| portfolio | `^4.1.1` | `^4.4.0` | Adopted the published pair (same lint/typecheck stack). |
 | docs | `^3.5.1` | `^3.7.2` | Not yet upgraded; the workspace links it to 4.x to surface breakage. |
 | conclave | `^4.0.2` | `4.2.0` pinned | Bump the CLI when validating a new one (4.4.0 last tested). |
 
