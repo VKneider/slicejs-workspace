@@ -28,8 +28,8 @@ There is no `npm publish` in the inner loop, no manual copy into the pnpm store 
 
 | Directory | npm package | Local version | Role | Remote |
 |---|---|---|---|---|
-| `repos/slice.js` | `slicejs-web-framework` | 4.0.2 | Framework runtime + `api/framework` + demo app | `vkneider/slice.js` |
-| `repos/slicejs-cli` | `slicejs-cli` | 4.3.0 | CLI: dev server, build, init, components, types | `vkneider/slicejs-cli` |
+| `repos/slice.js` | `slicejs-web-framework` | 4.1.0 | Framework runtime + `api/framework` + demo app | `vkneider/slice.js` |
+| `repos/slicejs-cli` | `slicejs-cli` | 4.4.0 | CLI: dev server, build, init, components, types | `vkneider/slicejs-cli` |
 | `repos/slicejs-components` | `slicejs-components` | 2.0.0 | Slice.js Components: official visual/service components, registry, component docs and DOM e2e | `VKneider/slicejs-components` |
 | `repos/slicejs-mcp` | `slicejs-mcp` | 1.2.1 | MCP server exposing the framework and Components documentation catalogs | `VKneider/slicejs-mcp` |
 | `repos/slice.js_docs` | `slicedocs` | 3.8.0 | Markdown-generated documentation site | `vkneider/slice.js_docs` |
@@ -171,12 +171,12 @@ resolve. `pnpm doctor` reports the differences.
 
 Current skew:
 
-- `slicejs-cli@4.3.0` declares `slicejs-web-framework: ^3.5.0`, but the workspace links it to
-  4.0.2. That is a stale declaration in the CLI; Slice.js Components already uses CLI 4.3.0 +
-  framework 4.0.2. If something in the CLI breaks only in the workspace, check this combination
+- `slicejs-cli@4.4.0` declares `slicejs-web-framework: ^4.0.2`, and the workspace links it to
+  4.1.0. Slice.js Components declares CLI ^4.3.0 (which accepts 4.4.0). If something in the CLI
+  breaks only in the workspace, check this combination
   first.
 - `conclave` declares `slicejs-cli@4.2.0` and `slicejs-web-framework: ^4.0.2`; the workspace gives
-  it CLI 4.3.0 and the local framework 4.0.2. This is useful for validating the new CLI against the
+  it CLI 4.4.0 and the local framework 4.1.0. This is useful for validating the new CLI against the
   product, but a failure may come from the 4.2 → 4.3 jump.
 - `slice.js_docs` declares framework/CLI 3.x. Linking it to 4.x is intentional to surface
   incompatibilities, not a compatibility promise.
@@ -227,14 +227,20 @@ For a Conclave UI change: lint + build + the affected specs.
 - Working contract: root `AGENTS.md`.
 - Documentation policy and page map: `docs/DOCUMENTATION.md`.
 - Future feature proposals: `docs/FEATURES.md` / `pnpm feature:list`.
+- Features and repo health in one view: `pnpm dashboard` (`docs/DASHBOARD.md`).
 - Agent skill: `.opencode/skills/slice-js-developer` (canonical source:
   `repos/slice.js_docs/skill/slice-js-developer`; sync with `pnpm sync:skill`).
 
 ## 10. Skill and documentation
 
-The workspace ships the `slice-js-developer` skill (v1.12.0, targets framework 4.x) so agents load
+The workspace ships the `slice-js-developer` skill (v1.27.0, targets framework 4.x) so agents load
 Slice's mental model before writing code. Its canonical source is the docs repo; the vendored copy
 exists for offline OpenCode use. `pnpm check:skill` / `pnpm doctor` report drift.
+
+It also vendors three upstream skills, each with a `SOURCE.md` and its license: `tdd`
+(Matt Pocock), `frontend-design` (Anthropic) and `make-interfaces-feel-better` (Jakub Krehel).
+They are general engineering/design skills, not Slice API guidance; keep them unmodified and
+update them from upstream.
 
 Documentation is not optional. Every change needs a docs decision: a docs commit for user-facing
 behavior, or a recorded reason for no docs impact. Framework changes must be checked against the

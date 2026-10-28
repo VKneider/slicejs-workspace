@@ -26,10 +26,10 @@ a project. `slice sync` follows the default branch.
 
 | Consumer | Framework | CLI | Notes |
 |---|---|---|---|
-| `slicejs-cli` | `^3.5.0` declared (stale; effectively 4.x) | — | The declared range is a known inconsistency; fix it when releasing a 4.x CLI. |
-| Slice.js Components | `^4.0.2` | `^4.3.0` | Already on 4.x. |
+| `slicejs-cli` | `^4.0.2` (accepts 4.1.0) | — | 4.4.0 pairs with framework 4.1.0. |
+| Slice.js Components | `^4.0.2` | `^4.3.0` (4.4.0 after refresh) | Lockfile still pins the previous CLI until refreshed. |
 | docs | `^3.5.1` | `^3.7.2` | Not yet upgraded; the workspace links it to 4.x to surface breakage. |
-| conclave | `^4.0.2` | `4.2.0` pinned | Bump the CLI when validating a new one. |
+| conclave | `^4.0.2` | `4.2.0` pinned | Bump the CLI when validating a new one (4.4.0 last tested). |
 
 The workspace overrides intentionally ignore these ranges. Before releasing, make sure the ranges
 in each `package.json` describe the combination you actually tested.

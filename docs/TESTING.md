@@ -139,9 +139,10 @@ pnpm build:conclave
 `dist/Slice/Slice.js`. `pnpm doctor` compares that copy with the source afterward and warns if it
 is stale.
 
-Builds may rewrite generated files (`src/Components/components.js`, `src/bundles/`). Treat those as
-build output: review them, do not commit them accidentally, and restore the registry with
+Builds may rewrite generated files (`src/Components/components.js`). Treat those as build output:
+review them, do not commit them accidentally, and restore the registry with
 `git checkout -- src/Components/components.js` if the change was only formatting/line endings.
+Bundles are build output too, and live in `dist/bundles/` (git-ignored).
 
 ## 4. Playwright installation
 
