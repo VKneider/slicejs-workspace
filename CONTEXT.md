@@ -28,12 +28,13 @@ There is no `npm publish` in the inner loop, no manual copy into the pnpm store 
 
 | Directory | npm package | Local version | Role | Remote |
 |---|---|---|---|---|
-| `repos/slice.js` | `slicejs-web-framework` | 4.1.0 | Framework runtime + `api/framework` + demo app | `vkneider/slice.js` |
+| `repos/slice.js` | `slicejs-web-framework` | 4.1.1 | Framework runtime + `api/framework` + demo app | `vkneider/slice.js` |
 | `repos/slicejs-cli` | `slicejs-cli` | 4.4.0 | CLI: dev server, build, init, components, types | `vkneider/slicejs-cli` |
 | `repos/slicejs-components` | `slicejs-components` | 2.0.0 | Slice.js Components: official visual/service components, registry, component docs and DOM e2e | `VKneider/slicejs-components` |
 | `repos/slicejs-mcp` | `slicejs-mcp` | 1.2.1 | MCP server exposing the framework and Components documentation catalogs | `VKneider/slicejs-mcp` |
 | `repos/slice.js_docs` | `slicedocs` | 3.8.0 | Markdown-generated documentation site | `vkneider/slice.js_docs` |
 | `repos/conclave` | `teams-organizer` | 1.0.0 | Real production product (group decision-making) | `vkneider/conclave` |
+| `repos/slicejs-lab` | `slicejs-lab` | 0.1.0 | Complete-app showcase and UI/component fluidity lab (M0) | `vkneider/slicejs-lab` |
 
 All local workspace branches are `master`.
 
@@ -47,6 +48,7 @@ graph TD
   MCP["slicejs-mcp<br/>repos/slicejs-mcp"]
   DOCS["slicedocs<br/>repos/slice.js_docs"]
   CON["teams-organizer (Conclave)<br/>repos/conclave"]
+  LAB["slicejs-lab<br/>repos/slicejs-lab"]
 
   CLI --> FW
   VL --> FW
@@ -57,6 +59,9 @@ graph TD
   DOCS --> CLI
   CON --> FW
   CON --> CLI
+  LAB --> FW
+  LAB --> CLI
+  LAB --> VL
 ```
 
 `pnpm-workspace.yaml` forces **all** of those arrows to point at the local checkouts. In a
@@ -163,6 +168,17 @@ serving an old `dist/`, you will not see the change: rebuild.
   on serverless). The workspace does not reproduce that deploy.
 - It is the best proving ground for real framework regressions.
 
+### `slicejs-lab` — the complete app and fluidity lab
+
+- A real Slice.js app that consumes the local framework, CLI and components. It is **not** the
+  only Slice.js app and not a replacement for the dashboard or Conclave.
+- M0 shell: `SideMenu` navigation, `NAVY`/`NAVY_DAY` themes, an overview fed by `/api/features`
+  over the dashboard JSON contract, and a `/fluidity` benchmark (20 real Cards, 500 rows, frame
+  sampling, long tasks, memory).
+- The plan, coverage matrix and remaining slices are in
+  [`docs/LAB.md`](docs/LAB.md) and feature `workspace:0002`.
+- Do not write workspace data from the lab; future mutation exercises use an in-memory store.
+
 ## 6. Current state and known skew
 
 The workspace **deliberately ignores semver ranges** when linking. That is what allows testing
@@ -172,11 +188,11 @@ resolve. `pnpm doctor` reports the differences.
 Current skew:
 
 - `slicejs-cli@4.4.0` declares `slicejs-web-framework: ^4.0.2`, and the workspace links it to
-  4.1.0. Slice.js Components declares CLI ^4.3.0 (which accepts 4.4.0). If something in the CLI
+  4.1.1. Slice.js Components declares CLI ^4.3.0 (which accepts 4.4.0). If something in the CLI
   breaks only in the workspace, check this combination
   first.
 - `conclave` declares `slicejs-cli@4.2.0` and `slicejs-web-framework: ^4.0.2`; the workspace gives
-  it CLI 4.4.0 and the local framework 4.1.0. This is useful for validating the new CLI against the
+  it CLI 4.4.0 and the local framework 4.1.1. This is useful for validating the new CLI against the
   product, but a failure may come from the 4.2 → 4.3 jump.
 - `slice.js_docs` declares framework/CLI 3.x. Linking it to 4.x is intentional to surface
   incompatibilities, not a compatibility promise.
@@ -228,6 +244,7 @@ For a Conclave UI change: lint + build + the affected specs.
 - Documentation policy and page map: `docs/DOCUMENTATION.md`.
 - Future feature proposals: `docs/FEATURES.md` / `pnpm feature:list`.
 - Features and repo health in one view: `pnpm dashboard` (`docs/DASHBOARD.md`).
+- Complete app / UI fluidity lab: `pnpm dev:lab` (`docs/LAB.md`).
 - Agent skill: `.opencode/skills/slice-js-developer` (canonical source:
   `repos/slice.js_docs/skill/slice-js-developer`; sync with `pnpm sync:skill`).
 
