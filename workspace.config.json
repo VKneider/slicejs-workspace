@@ -55,6 +55,15 @@
       "remote": "https://github.com/vkneider/conclave.git",
       "branch": "master",
       "required": true
+    },
+    {
+      "dir": "portfolio",
+      "name": "portfolio",
+      "package": "portfoliovk2",
+      "role": "product",
+      "remote": "https://github.com/VKneider/portfolio.git",
+      "branch": "master",
+      "required": false
     }
   ],
   "links": [
@@ -71,6 +80,7 @@
     "conclave",
     "slicejs-components",
     "slice.js_docs",
-    "slicejs-cli"
+    "slicejs-cli",
+    "portfolio"
   ]
 }
