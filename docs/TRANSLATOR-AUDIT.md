@@ -46,8 +46,8 @@ published yet).
 | P1-11 | Translator off: a later `el.prop = slice.t.ref(...)` stores the marker object | `Translator.js:406` | fixed |
 | P1-12 | `enabled: true` without `defaultLocale` silently disables the feature (and the CLI gate is green) | `Translator.js:55` | fixed |
 | P1-13 | Locale names differing only in case create a phantom locale that 404s at boot | `Translator.js:59-70` | fixed |
-| P1-14 | `syncUrl()` prefixes unknown prefixes (`/fr/x` → `/es/fr/x`) with `localePrefix: "always"` | `Translator.js:792-798` | open |
-| P1-15 | Empty/`false` title removes `<title>` on the server while the client keeps the old one | `seo.js:271-273` | open |
+| P1-14 | `syncUrl()` prefixes unknown prefixes (`/fr/x` → `/es/fr/x`) with `localePrefix: "always"` | `Translator.js:792-798` | fixed |
+| P1-15 | Empty/`false` title removes `<title>` on the server while the client keeps the old one | `seo.js:271-273` | fixed |
 | P1-16 | No manifest validation at startup; a missing/empty `routes.js` silently 404s the whole site | `server.js:264-444` | fixed |
 | P1-17 | Server `has()` accepts a group key the client rejects | `seo.js:106` | fixed |
 | P1-18 | `fallbackLocale` is appended to the client locales but not to the server context | `Translator.js:67-70`, `seo.js:68-71` | fixed |
@@ -57,33 +57,33 @@ published yet).
 
 | ID | Finding | Location | Status |
 | --- | --- | --- | --- |
-| P2-1 | Debugger never subscribes to `translator:change` (created before `slice.events`) | `Slice.js:629-635` | open |
-| P2-2 | Shortcut handler has no input guard, no dead-panel check, no duplicate detection, no `event.repeat` guard | `Slice.js:730-768` | open |
+| P2-1 | Debugger never subscribes to `translator:change` (created before `slice.events`) | `Slice.js:629-635` | fixed |
+| P2-2 | Shortcut handler has no input guard, no dead-panel check, no duplicate detection, no `event.repeat` guard | `Slice.js:730-768` | fixed |
 | P2-3 | Observer matches every `data-t*` attribute (`data-theme`, `data-tab`, …) | `Translator.js:773` | fixed |
 | P2-4 | `<textarea data-t>` can never be filled (treated as void) | `dom.js:33-36` | fixed |
-| P2-5 | Slot cache is never invalidated: a removed slot is re-inserted on the next switch | `dom.js:231-243` | open |
-| P2-6 | `format.date/number/currency/relative` throw on invalid input | `Translator.js:560-581` | open |
-| P2-7 | A malformed active entry blocks the fallback lookup | `Translator.js:234-238` | open |
-| P2-8 | `load()` during an in-flight switch loses the namespace for the new locale | `Translator.js:302-311` | open |
+| P2-5 | Slot cache is never invalidated: a removed slot is re-inserted on the next switch | `dom.js:231-243` | fixed |
+| P2-6 | `format.date/number/currency/relative` throw on invalid input | `Translator.js:560-581` | fixed |
+| P2-7 | A malformed active entry blocks the fallback lookup | `Translator.js:234-238` | fixed |
+| P2-8 | `load()` during an in-flight switch loses the namespace for the new locale | `Translator.js:302-311` | fixed |
 | P2-9 | `texts()` drops params on the English fallback | `texts.js:82-92` | fixed |
 | P2-10 | `setShowKeys(true)` cannot show library keys: `texts()` turns the key into English | `texts.js:88` | fixed |
-| P2-11 | `slice get` reports success when a helper (`shared/**`) failed to download | `getComponent.js:502-509,400` | open |
-| P2-12 | `slice get Icon` requests five font files that no longer exist | `getComponent.js:189-191` | open |
-| P2-13 | `scanJs` matches `obj.translate(...)`/`obj.tr(...)`, misses `$t()`/`t()` | `scan.js:84` | open |
-| P2-14 | Scan scope does not match the docs; JS-injected `data-t` is never scanned | `scan.js:119-126`, `translator.md:197` | open |
-| P2-15 | `slice translator init` re-enables a deliberately disabled translator | `init.js:41` | open |
-| P2-16 | Invalid `sliceConfig.json` is reported as “translator not configured” | `scan.js:156-167` | open |
-| P2-17 | Schema validator ignores `if/then`, `minLength`, `uniqueItems`, `additionalProperties` | `sliceConfigSchema.js:34-65` | open |
-| P2-18 | Docs/skill stale: “do not enable routing before the migration”, `key()`, “eleven components”, “built-ins are `data-t`” | skill + `translator.md` | open |
-| P2-19 | Lab e2e comments still say `key()` | `translator.e2e.mjs:4,164` | open |
+| P2-11 | `slice get` reports success when a helper (`shared/**`) failed to download | `getComponent.js:502-509,400` | fixed |
+| P2-12 | `slice get Icon` requests five font files that no longer exist | `getComponent.js:189-191` | fixed |
+| P2-13 | `scanJs` matches `obj.translate(...)`/`obj.tr(...)`, misses `$t()`/`t()` | `scan.js:84` | fixed |
+| P2-14 | Scan scope does not match the docs; JS-injected `data-t` is never scanned | `scan.js:119-126`, `translator.md:197` | fixed |
+| P2-15 | `slice translator init` re-enables a deliberately disabled translator | `init.js:41` | fixed |
+| P2-16 | Invalid `sliceConfig.json` is reported as “translator not configured” | `scan.js:156-167` | fixed |
+| P2-17 | Schema validator ignores `if/then`, `minLength`, `uniqueItems`, `additionalProperties` | `sliceConfigSchema.js:34-65` | fixed |
+| P2-18 | Docs/skill stale: “do not enable routing before the migration”, `key()`, “eleven components”, “built-ins are `data-t`” | skill + `translator.md` | fixed |
+| P2-19 | Lab e2e comments still say `key()` | `translator.e2e.mjs:4,164` | fixed |
 | P2-20 | `fallbackLocale: ""` yields `""` instead of `null` | `Translator.js:63-66` | fixed |
-| P2-21 | `stripLocalePrefix` omits the fallback locale → wrong route bundle preload | `Slice.js:428-436` | open |
-| P2-22 | 404 `<title>` is English in every locale | `server.js:376` | open |
-| P2-23 | Redirects drop `?query`; a 301 is cached for an hour | `server.js:198-202` | open |
-| P2-24 | Single locale + `"always"` emits duplicate `hreflang`/`x-default` | `seo.js:429-439` | open |
-| P2-25 | No EN/ES key-parity test for the component tables | `slicejs-components` | open |
-| P2-26 | `texts()` keeps the first registration for a namespace, silently | `texts.js:41-58` | open |
-| P2-27 | Table's `textLayer` materializes `operators` eagerly; a future direct read regresses | `Table.js:184-192` | open |
-| P2-28 | Manifest-level `titlePrefix`/`titleSuffix` are ignored (no warning) | `seo.js:269-270` | open |
-| P2-29 | `slice seo check` emits a false “title differs” for `{t}` manifests (no translate) | `seo.js:617-618` | open |
-| P2-30 | Server 404 title/description do not follow `titleKey`/affixes | `server.js:374-380` | open |
+| P2-21 | `stripLocalePrefix` omits the fallback locale → wrong route bundle preload | `Slice.js:428-436` | fixed |
+| P2-22 | 404 `<title>` is English in every locale | `server.js:376` | fixed |
+| P2-23 | Redirects drop `?query`; a 301 is cached for an hour | `server.js:198-202` | fixed |
+| P2-24 | Single locale + `"always"` emits duplicate `hreflang`/`x-default` | `seo.js:429-439` | fixed |
+
+| P2-26 | `texts()` keeps the first registration for a namespace, silently | `texts.js:41-58` | fixed |
+| P2-27 | Table's `textLayer` materializes `operators` eagerly; a future direct read regresses | `Table.js:184-192` | fixed |
+| P2-28 | Manifest-level `titlePrefix`/`titleSuffix` are ignored (no warning) | `seo.js:269-270` | fixed |
+| P2-29 | `slice seo check` emits a false “title differs” for `{t}` manifests (no translate) | `seo.js:617-618` | fixed |
+| P2-30 | Server 404 title/description do not follow `titleKey`/affixes | `server.js:374-380` | fixed |
