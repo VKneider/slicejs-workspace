@@ -2,8 +2,8 @@
 
 - **Canonical source:** `repos/slice.js_docs/skill/slice-js-developer`
 - **Upstream:** `https://github.com/VKneider/slicejs_docs/tree/master/skill/slice-js-developer`
-- **Vendored version:** `1.32.0`
-- **Targets:** `slicejs-web-framework ^4.1.x`
+- **Vendored version:** `1.32.1`
+- **Targets:** `slicejs-web-framework ^4.2.x`
 - **Sync command:** `pnpm sync:skill`
 
 Do not edit the files in this directory by hand. Edit the skill in the docs repository, update its
