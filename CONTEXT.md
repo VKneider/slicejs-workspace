@@ -34,7 +34,7 @@ There is no `npm publish` in the inner loop, no manual copy into the pnpm store 
 | `repos/slicejs-mcp` | `slicejs-mcp` | 1.2.1 | MCP server exposing the framework and Components documentation catalogs | `VKneider/slicejs-mcp` |
 | `repos/slice.js_docs` | `slicedocs` | 3.8.0 | Markdown-generated documentation site | `vkneider/slice.js_docs` |
 | `repos/conclave` | `teams-organizer` | 1.0.0 | Real production product (group decision-making) | `vkneider/conclave` |
-| `repos/slicejs-lab` | `slicejs-lab` | 0.1.0 | Complete-app showcase and UI/component fluidity lab (M0) | `vkneider/slicejs-lab` |
+| `repos/slicejs-lab` | `slicejs-lab` | 0.1.0 | Feature workbench and UI/component fluidity lab (M0) | `vkneider/slicejs-lab` |
 
 All local workspace branches are `master`.
 
@@ -191,9 +191,9 @@ Current skew:
   4.1.1. Slice.js Components declares CLI ^4.3.0 (which accepts 4.4.0). If something in the CLI
   breaks only in the workspace, check this combination
   first.
-- `conclave` declares `slicejs-cli@4.2.0` and `slicejs-web-framework: ^4.0.2`; the workspace gives
-  it CLI 4.4.0 and the local framework 4.1.1. This is useful for validating the new CLI against the
-  product, but a failure may come from the 4.2 → 4.3 jump.
+- `conclave` matches the workspace now: framework `^4.1.1` and CLI `4.4.0`. Its serverless
+  entrypoint mounts `sliceFallback()` by hand, because Vercel imports the exported app without ever
+  calling `start()` (which is where 4.1.1 moved the terminal fallback).
 - `slice.js_docs` declares framework/CLI 3.x. Linking it to 4.x is intentional to surface
   incompatibilities, not a compatibility promise.
 - Local versions can change without the workspace changing. `pnpm doctor` shows
