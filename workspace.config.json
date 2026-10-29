@@ -64,16 +64,6 @@
       "remote": "https://github.com/VKneider/portfolio.git",
       "branch": "master",
       "required": false
-    },
-    {
-      "dir": "slicejs-lab",
-      "name": "slicejs-lab",
-      "package": "slicejs-lab",
-      "role": "lab",
-      "remote": "https://github.com/vkneider/slicejs-lab.git",
-      "branch": "master",
-      "required": false,
-      "sync": false
     }
   ],
   "links": [
@@ -91,7 +81,6 @@
     "slicejs-components",
     "slice.js_docs",
     "slicejs-cli",
-    "portfolio",
-    "slicejs-lab"
+    "portfolio"
   ]
 }
