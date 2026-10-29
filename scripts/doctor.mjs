@@ -148,9 +148,10 @@ function checkRepos() {
   }
 
   const knownDirs = new Set(manifest.repos.map((repo) => repo.dir));
+  const localDirs = new Set(manifest.localRepos || []);
   if (existsSync(reposRoot)) {
     const extraDirs = readdirSync(reposRoot, { withFileTypes: true })
-      .filter((entry) => entry.isDirectory() && !knownDirs.has(entry.name))
+      .filter((entry) => entry.isDirectory() && !knownDirs.has(entry.name) && !localDirs.has(entry.name))
       .map((entry) => entry.name);
     if (extraDirs.length > 0) {
       warn(`Directories in repos/ that are not in the manifest: ${extraDirs.join(', ')}`);

@@ -1,6 +1,7 @@
 {
   "$comment": "Manifest consumed by scripts/bootstrap.mjs, scripts/doctor.mjs and scripts/status.mjs. Keep remotes/branches in sync with .git/config of each checkout.",
   "reposDir": "repos",
+  "localRepos": ["slicejs-lab"],
   "repos": [
     {
       "dir": "slice.js",
