@@ -75,6 +75,10 @@ function verifyExisting(repo) {
 
 function maybePull(repo) {
   if (!pull) return;
+  if (repo.sync === false) {
+    skipped.push(`${repo.dir}: local-only repo`);
+    return;
+  }
 
   const branch = gitOutput(repo, ['branch', '--show-current'], { allowFailure: true });
   if (branch !== repo.branch) {
@@ -148,6 +152,11 @@ for (const repo of manifest.repos) {
     fail(
       `${repo.dir} exists but is not a Git repository. Move it or delete it before continuing (nothing is touched automatically).`,
     );
+    continue;
+  }
+
+  if (repo.sync === false) {
+    log.warn(`${repo.dir}: local-only repo is missing; create it manually (it has no remote yet).`);
     continue;
   }
 

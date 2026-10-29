@@ -16,6 +16,11 @@ for (const repo of manifest.repos) {
 
   log.step(`${repo.dir}`);
 
+  if (repo.sync === false) {
+    log.info('  local-only repo; skipping fetch (no upstream yet).');
+    continue;
+  }
+
   const fetch = git(repo, ['fetch', '--prune', 'origin'], { capture: true, allowFailure: true });
   if (fetch.status !== 0) {
     failed += 1;

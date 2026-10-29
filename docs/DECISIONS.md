@@ -219,4 +219,82 @@ now fail a pipeline, which is a behavior change for anyone scripting it.
 place. If a command needs to present a finding differently, it changes the presentation, never the
 severity.
 
+## ADR-013 — The dashboard is a view, never a source of truth
+
+**Decision:** `pnpm dashboard` serves a local, read-only dashboard built from the per-repo
+`features/` frontmatter, `workspace.config.json`, Git metadata and the same link checks as
+`doctor`. It reuses the feature parser shared with `feature:list` (ADR-010) and adds a rendered
+Markdown viewer for the spec; it never writes, promotes or creates feature files.
+
+**Why:**
+
+- The per-repo model only pays off if the cross-repo state is legible. Running `feature:list`,
+  `status` and `doctor` separately and opening Markdown files by hand is too slow for a routine
+  "what is in progress, and is its repo healthy?" question.
+- A dashboard makes the existing records visible without creating a second backlog or a generated
+  artifact that drifts. The Markdown viewer is part of the same view: the spec body is already in
+  the feature file.
+- Sharing the parser is what keeps the CLI and the UI from disagreeing about status, area or IDs.
+
+**Trade-off:** two presentations (CLI and dashboard) and a health summary that mirrors `doctor`.
+The parser is shared, but the health checks are duplicated; `doctor` remains authoritative, so a
+rule change must land in both. The static export is a snapshot, not a record, and is gitignored.
+
+**Rule that follows:** never put editable state in the dashboard. Status and content live in the
+feature frontmatter; the dashboard only reads them. If the dashboard and `doctor` disagree about
+links or versions, `doctor` wins.
+
+## ADR-014 — Vendor third-party skills with provenance, unmodified
+
+**Decision:** commit general engineering/design skills under `.opencode/skills/` as unmodified
+upstream copies, each with a `SOURCE.md` (upstream URL, path, commit, vendoring date) and the
+upstream license. The first set is `tdd` (Matt Pocock), `frontend-design` (Anthropic) and
+`make-interfaces-feel-better` (Jakub Krehel).
+
+**Why:**
+
+- OpenCode only auto-loads project skills from `.opencode/skills`; keeping them in the workspace
+  makes the same guidance available offline and on every machine.
+- These skills shape how the dashboard is designed and tested (visual direction, polish review,
+  red-green-refactor), so they belong next to the code they influence.
+- Provenance and licenses matter for a public repository. A commit hash makes the copy auditable
+  and an update is a deliberate act, not a silent drift.
+
+**Trade-off:** vendored copies need manual updates. Editing them locally makes future updates
+harder and hides the change from upstream. The rule is: update from the upstream commit, never
+hand-edit the vendored skill; `SOURCE.md` is the pointer. Unlike the `slice-js-developer` skill,
+these are not part of the release contract and `pnpm doctor` does not check them.
+
+**Rule that follows:** a new vendored skill gets a `SOURCE.md`, its license, and an upstream
+commit; a local change to its content is a fork, not a vendoring.
+
+## ADR-015 — A separate lab app, not a smarter monitor
+
+**Decision:** keep `pnpm dashboard` as the zero-dependency monitor and build the complete-app /
+fluidity work as a separate Slice.js app (`repos/slicejs-lab`). The lab consumes the dashboard JSON
+contract, uses `SideMenu` and app-local `NAVY`/`NAVY_DAY` themes, and owns the component/pattern
+showcase and the UI benchmark.
+
+**Why:**
+
+- The monitor must boot when the framework, links or CLI are broken. Making it depend on Slice.js
+  would remove the diagnostic path exactly when it is most needed.
+- A real app is the honest place to exercise routing, `createSliceServer`, fetch/caching,
+  loading/error/empty states, `SideMenu`, theming and the component library together.
+- Conclave is the production proving ground; adding a gallery or synthetic benchmarks there would
+  contaminate a product.
+- UI fluidity needs reproducible scenarios and instrumentation, not a dashboard full of unrelated
+  widgets. The lab can grow those without bloating the monitor.
+
+**Trade-off:** a new consumer in the workspace matrix, two UIs that can drift, and a scaffold that
+must be compared against `slice init` because it is assembled from the framework demo + local
+components (the init install path would pull registry copies and create a nested pnpm workspace).
+Performance numbers are browser/machine-dependent, so they are recorded with their environment, not
+treated as universal budgets. The repo is local-only until a remote exists: `sync: false` makes
+`pnpm sync` skip it, and `bootstrap` refuses to clone it automatically.
+
+**Rule that follows:** the lab reads workspace data through the JSON contract and never writes
+feature files, Git or `repos/`. The monitor stays dependency-free and keeps its own data path. If the
+lab becomes the canonical UI later, the monitor is still kept as `pnpm dashboard:plain`.
+
 

@@ -10,6 +10,8 @@ updated: {{date}}
 target: "{{target}}"
 owners: []
 related: []
+depends_on: []
+blocks: []
 ---
 
 # {{title}}

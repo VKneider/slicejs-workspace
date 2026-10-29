@@ -2,24 +2,16 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { ROOT, manifest, log, repoByName, repoPath } from './lib/workspace.mjs';
-
-const WORKSPACE = 'workspace';
-const AREA_REPO = {
-  framework: 'slice.js',
-  cli: 'slicejs-cli',
-  components: 'slicejs-components',
-  docs: 'slice.js_docs',
-  mcp: 'slicejs-mcp',
-  conclave: 'conclave',
-  workspace: WORKSPACE,
-  ecosystem: WORKSPACE,
-};
-const REPO_AREA = Object.fromEntries(
-  Object.entries(AREA_REPO).map(([area, repo]) => [repo, area === 'ecosystem' ? 'ecosystem' : area]),
-);
-const AREAS = new Set(Object.keys(AREA_REPO));
-const PRIORITIES = new Set(['low', 'medium', 'high']);
-const STATUSES = new Set(['proposed', 'planned', 'in-progress', 'blocked', 'done', 'rejected']);
+import {
+  AREAS,
+  AREA_REPO,
+  PRIORITIES,
+  REPO_AREA,
+  STATUSES,
+  WORKSPACE,
+  collectFeatures,
+  toListEntry,
+} from './lib/features.mjs';
 
 const args = process.argv.slice(2);
 const command = args[0] || 'list';
@@ -65,7 +57,7 @@ function normalizeRepo(value) {
 function resolveRepo(options) {
   if (options.repo) return normalizeRepo(String(options.repo));
   const area = options.area ? String(options.area) : 'framework';
-  if (!AREAS.has(area)) {
+  if (!AREAS.includes(area)) {
     throw new Error(`Unknown area "${area}". Use one of: ${[...AREAS].join(', ')}.`);
   }
   return AREA_REPO[area];
@@ -122,12 +114,12 @@ function newFeature(rest) {
 
   const area = String(options.area || REPO_AREA[repo] || 'framework');
   const priority = String(options.priority || 'medium');
-  if (!AREAS.has(area)) {
+  if (!AREAS.includes(area)) {
     log.error(`Unknown area "${area}". Use one of: ${[...AREAS].join(', ')}.`);
     process.exitCode = 1;
     return;
   }
-  if (!PRIORITIES.has(priority)) {
+  if (!PRIORITIES.includes(priority)) {
     log.error(`Unknown priority "${priority}". Use one of: ${[...PRIORITIES].join(', ')}.`);
     process.exitCode = 1;
     return;
@@ -174,23 +166,6 @@ function newFeature(rest) {
   log.info('Next: fill in Summary, Problem, Proposed direction and Scope. Commit it in the owning repo.');
 }
 
-function parseFrontMatter(text) {
-  const match = text.match(/^---\r?\n([\s\S]*?)\r?\n---/);
-  if (!match) return {};
-  const data = {};
-  for (const line of match[1].split(/\r?\n/)) {
-    const separator = line.indexOf(':');
-    if (separator === -1) continue;
-    const key = line.slice(0, separator).trim();
-    let value = line.slice(separator + 1).trim();
-    if (value.startsWith('"') && value.endsWith('"')) {
-      value = value.slice(1, -1).replace(/\\"/g, '"').replace(/\\\\/g, '\\');
-    }
-    data[key] = value;
-  }
-  return data;
-}
-
 function listFeatures(rest) {
   const { options } = parseOptions(rest);
   let repoFilter = null;
@@ -206,30 +181,13 @@ function listFeatures(rest) {
   const status = options.status ? String(options.status) : null;
   const area = options.area ? String(options.area) : null;
 
-  const sources = [{ repo: WORKSPACE, dir: join(ROOT, 'features') }];
-  for (const repo of manifest.repos) {
-    sources.push({ repo: repo.dir, dir: join(reposRootFor(repo), 'features') });
-  }
-
-  const entries = [];
-  for (const source of sources) {
-    if (repoFilter && source.repo !== repoFilter) continue;
-    if (!existsSync(source.dir)) continue;
-    for (const name of readdirSync(source.dir)) {
-      if (!/^\d{4}-.+\.md$/.test(name)) continue;
-      const data = parseFrontMatter(readFileSync(join(source.dir, name), 'utf8'));
-      entries.push({
-        repo: data.repo || source.repo,
-        id: data.id || name.slice(0, 4),
-        doc_id: `${data.repo || source.repo}:${data.id || name.slice(0, 4)}`,
-        title: data.title || name.replace(/^\d{4}-/, '').replace(/\.md$/, ''),
-        status: data.status || 'proposed',
-        area: data.area || 'unknown',
-        priority: data.priority || 'unknown',
-        target: data.target || 'TBD',
-      });
-    }
-  }
+  const entries = collectFeatures({
+    root: ROOT,
+    repos: manifest.repos,
+    reposDir: manifest.reposDir,
+  })
+    .filter((entry) => !repoFilter || entry.sourceRepo === repoFilter)
+    .map(toListEntry);
 
   const filtered = entries
     .filter((entry) => (!status || entry.status === status) && (!area || entry.area === area))
@@ -259,10 +217,6 @@ function listFeatures(rest) {
   for (const entry of filtered) {
     console.log(columns.map((column) => pad(entry[column.key], column.width)).join(' '));
   }
-}
-
-function reposRootFor(repo) {
-  return join(ROOT, manifest.reposDir || 'repos', repo.dir);
 }
 
 mkdirSync(join(ROOT, 'features'), { recursive: true });

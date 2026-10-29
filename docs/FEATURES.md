@@ -62,6 +62,8 @@ updated: 2026-10-26
 target: TBD
 owners: []
 related: []
+depends_on: []
+blocks: []
 ---
 ```
 
@@ -82,6 +84,14 @@ Areas: `framework`, `cli`, `components`, `docs`, `mcp`, `conclave`, `workspace`,
 | `workspace` / `ecosystem` | `slice-workspace` |
 
 `pnpm feature:new` infers the repo from the area. Use `--repo <dir>` to override.
+
+### Dependencies
+
+`depends_on` lists features this one needs; `blocks` is the inverse, written on the feature that
+blocks another. Both use qualified ids (`slicejs-components:0004`), are optional, and are validated
+for unknown references, self-references and cycles. A dependency does not move work by itself; the
+editor uses it as a promotion gate (a feature should not be marked `done` with unfinished
+dependencies).
 
 ## `features/` vs `BACKLOG.md` vs GitHub Issues
 
@@ -123,10 +133,18 @@ pnpm feature:list --status planned
 pnpm feature:list --area cli
 pnpm feature:list --repo slicejs-components
 pnpm feature:list --json
+
+# The same data in a read-only local dashboard (spec viewer + repo health)
+pnpm dashboard
 ```
 
 The CLI creates `<repo>/features/` on demand and copies `features/_TEMPLATE.md` from the workspace.
 The feature is committed in the **owning repo**, not in the workspace.
+
+`pnpm dashboard` is another presentation of this model, never a second source of truth. It reads the
+same frontmatter through `scripts/lib/features.mjs` (shared with `feature:list`), adds a rendered
+Markdown viewer for the spec and shows Git/link health next to it. See
+[`DASHBOARD.md`](./DASHBOARD.md).
 
 ## Standalone repo usage
 

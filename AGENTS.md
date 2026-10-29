@@ -60,7 +60,10 @@ Only when the task needs it:
 | MCP server / catalogs | `repos/slicejs-mcp/README.md`, `repos/slicejs-mcp/src/catalogs.ts` |
 | Documentation policy and framework→docs mapping | `docs/DOCUMENTATION.md` |
 | Future feature proposals / roadmap | `docs/FEATURES.md`, `pnpm feature:list` |
+| Feature dashboard / repo health view | `docs/DASHBOARD.md`, `pnpm dashboard` |
+| Feature workbench / UI fluidity lab | `docs/LAB.md`, `repos/slicejs-lab/README.md`, `pnpm dev:lab` |
 | Skill guidance / vendored skill | `repos/slice.js_docs/skill/slice-js-developer/`, `.opencode/skills/slice-js-developer/` |
+| TDD, visual design, UI polish | `.opencode/skills/tdd/`, `.opencode/skills/frontend-design/`, `.opencode/skills/make-interfaces-feel-better/` |
 | Release / compatibility | `docs/RELEASE.md` |
 
 Do not read `repos/slice.js_docs/llm.txt`, build output, Playwright reports, or generated
@@ -79,12 +82,15 @@ pnpm sync:skill            # copy the canonical skill from repos/slice.js_docs
 pnpm check:skill           # fail if the vendored skill drifted
 pnpm feature:new "Title"   # capture a future feature (does not implement it)
 pnpm feature:list          # list features by status/area/repo
+pnpm dashboard             # serve the read-only features/repo-health dashboard
 pnpm verify:conclave       # boot Conclave and prove the local runtime is what it serves
 
 pnpm dev:conclave          # Conclave, port 3001 (product)
 pnpm dev:components        # Slice.js Components, port 3001
 pnpm dev:docs              # docs site, port 3001
 pnpm dev:framework         # slice.js demo, port 3001, with a self-link to the local runtime
+pnpm dev:lab               # Slice.js lab app, port 3002 (SideMenu + navy themes + fluidity)
+pnpm start:lab             # serve the lab production build from dist/
 ```
 
 Only one app can use port 3001 at a time. `verify:conclave` picks a free port.
@@ -92,6 +98,9 @@ Only one app can use port 3001 at a time. `verify:conclave` picks a free port.
 Tests and builds:
 
 ```bash
+pnpm test:workspace        # workspace scripts: feature parser, dashboard, markdown
+pnpm test:lab              # Slice.js lab JSON-contract tests
+pnpm build:lab             # Slice.js lab production build
 pnpm test:framework        # node --test Slice/tests
 pnpm test:cli              # node --test
 pnpm test:components       # unit/parser tests

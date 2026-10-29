@@ -21,3 +21,6 @@ coverage/
 dist/
 playwright-report/
 test-results/
+
+# Static dashboard snapshots (`pnpm dashboard --out`)
+.dashboard/

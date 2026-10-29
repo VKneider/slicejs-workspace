@@ -63,6 +63,7 @@ work.
 | `pnpm check:skill` | Fails if the vendored skill drifted from the docs source. |
 | `pnpm feature:new "Title"` | Captures a future feature proposal without implementing it. |
 | `pnpm feature:list` | Lists feature proposals by status/area/repo. |
+| `pnpm dashboard` | Serves a read-only dashboard of features, repo health and local links. `--json`, `--out`, `--port`. |
 | `pnpm docs:generate` | Regenerates the framework docs pages and routes. |
 | `pnpm docs:llm` | Rebuilds the docs LLM dump (`llm.txt`). |
 | `pnpm docs:lint:components` | Validates Slice.js Components component Markdown. |
@@ -75,6 +76,10 @@ work.
 | `pnpm dev:components` | Starts Slice.js Components. |
 | `pnpm dev:docs` | Starts the documentation site. |
 | `pnpm dev:framework` | Starts the `slice.js` demo with the local CLI and a runtime self-link. |
+| `pnpm dev:lab` | Starts the Slice.js lab app (SideMenu, navy themes, fluidity lab) on port 3002. |
+| `pnpm build:lab` | Builds the lab app and its bundles. |
+| `pnpm start:lab` | Serves the lab production build from `dist/`. |
+| `pnpm test:lab` | Runs the lab's JSON-contract tests. |
 | `pnpm verify:conclave` | End-to-end smoke test of the local link (boot + served runtime + HTTP). |
 | `pnpm test:framework` | Framework unit tests (`node --test`). |
 | `pnpm test:cli` | CLI tests (`node --test`). |
@@ -128,6 +133,20 @@ without network access.
 `opencode.jsonc` also enables the optional `slicemcp` server for live, authoritative documentation
 queries. The vendored skill remains fully usable offline via its `references/` directory.
 
+## Bundled agent skills
+
+The workspace also vendors three general-purpose skills under `.opencode/skills/`, used for the
+dashboard and for day-to-day work:
+
+| Skill | Purpose | Upstream | License |
+|---|---|---|---|
+| `tdd` | Red-green-refactor discipline, seams, test anti-patterns | [`mattpocock/skills`](https://github.com/mattpocock/skills) | MIT |
+| `frontend-design` | Distinctive visual direction, typography, layout and copy | [`anthropics/skills`](https://github.com/anthropics/skills) | Apache-2.0 |
+| `make-interfaces-feel-better` | Surfaces, motion, icons, typography and polish review | [`jakubkrehel/make-interfaces-feel-better`](https://github.com/jakubkrehel/make-interfaces-feel-better) | MIT |
+
+Each directory has a `SOURCE.md` with the upstream path and the commit it was taken from, plus the
+upstream license. They are unmodified copies: update them from upstream instead of editing them here.
+
 ## Documentation is part of the change
 
 A framework or CLI change is not complete until its documentation is checked. User-facing changes
@@ -155,6 +174,7 @@ pnpm sync:skill                                      # if the skill changed
 | `repos/slicejs-mcp` | `slicejs-mcp` | MCP server exposing the framework and Components documentation catalogs. |
 | `repos/slice.js_docs` | `slicedocs` | Markdown-generated documentation site. |
 | `repos/conclave` | `teams-organizer` | Real production product used as the proving ground. |
+| `repos/slicejs-lab` | `slicejs-lab` | Feature workbench and UI/component fluidity lab (M0). |
 
 > The former `slice.js_visual_library` repository is now **`slicejs-components`** (Slice.js
 > Components), matching `components.slicejs.com`. Old GitHub URLs redirect to the new name.
@@ -171,6 +191,8 @@ pnpm sync:skill                                      # if the skill changed
 - [`docs/TROUBLESHOOTING.md`](./docs/TROUBLESHOOTING.md) — common symptoms and fixes.
 - [`docs/DECISIONS.md`](./docs/DECISIONS.md) — why the workspace is built this way (short ADRs).
 - [`docs/FEATURES.md`](./docs/FEATURES.md) — the per-repo feature standard, statuses and CLI.
+- [`docs/DASHBOARD.md`](./docs/DASHBOARD.md) — the local features/repo-health dashboard and its data contract.
+- [`docs/LAB.md`](./docs/LAB.md) — the Slice.js lab app: SideMenu shell, navy themes and fluidity methodology.
 - [`features/README.md`](./features/README.md) — workspace/ecosystem features only.
 - [`BACKLOG.md`](./BACKLOG.md) — short ordered workspace/ecosystem backlog.
 

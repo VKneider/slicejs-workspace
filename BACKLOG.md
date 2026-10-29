@@ -6,7 +6,8 @@ Short, ordered list for **workspace/ecosystem** work. Detailed specs live in
 
 | Order | Item | Status | Area | Spec |
 |---|---|---|---|---|
-| — | No workspace-level items yet. | — | — | — |
+| 1 | Workspace dashboard for features and repo status | done | workspace | [`0001`](./features/0001-workspace-dashboard-for-features-and-repo-status.md) |
+| 2 | Slice.js lab: full app showcase and UI fluidity lab | in-progress | ecosystem | [`0002`](./features/0002-slice-js-lab-full-app-showcase-and-ui-fluidity.md) |
 
 When an item earns a spec:
 
