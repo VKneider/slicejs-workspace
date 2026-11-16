@@ -205,3 +205,55 @@ merge -> install/doctor/tests -> check-pack + release-check + pack smoke
 -> refresh consumers -> install/doctor
 -> deploy docs + Conclave
 ```
+
+## Post-release status — 2026-11-16
+
+Published and verified from the registry with a clean install:
+
+| Package | Version | `latest` |
+|---|---|---|
+| `slicejs-web-framework` | `4.3.0` | `4.3.0` |
+| `slicejs-cli` | `4.6.0` | `4.6.0` |
+
+Tags `v4.3.0` and `v4.6.0` exist locally and on GitHub. GitHub Releases were
+intentionally skipped.
+
+Consumer lockfiles were refreshed and pushed:
+
+| Repo | Commit |
+|---|---|
+| `slicejs-components` | `9831b34` |
+| `slice.js_docs` | `c2ce5b3` |
+| `portfolio` | `9aeb5c3` |
+| `conclave` | `15807c2` |
+
+### Two gotchas found during deployment
+
+1. **Conclave's `minimumReleaseAgeExclude` is version-pinned.** It lists
+   `slicejs-cli@4.1.0 || ... || 4.4.0` instead of the package name, so a new
+   release fails Vercel's frozen install with
+   `ERR_PNPM_MINIMUM_RELEASE_AGE_VIOLATION`. Fix: append the new versions
+   (`4.6.0`, `4.3.0`) in `repos/conclave/pnpm-workspace.yaml` and commit. Other
+   consumers exclude by package name and do not need this.
+2. **A generated docs page needs three registrations.** `docs:generate` builds
+   the component and `docsIndex.js`, but the site also needs the page in
+   `src/routes.js`, `src/Components/AppComponents/DocumentationPage/documentationRoutes.js`
+   and `src/Components/components.js`. Missing any of them gives a 404 or
+   "Component ... not found" with no build error. `Deployment`, `SEO` and
+   `Server-Entrypoint` were missing and are now registered.
+
+Live verification after the fixes:
+
+```text
+https://slicejs.com/Documentation/Deployment                    -> 200, full guide renders
+https://slicejs.com/Documentation/Architecture/SEO              -> 200
+https://slicejs.com/Documentation/Architecture/Server-Entrypoint -> 200
+https://conclave.vkneider.dev/                                  -> 200
+https://conclave.vkneider.dev/api/status                        -> 200
+https://vkneider.dev/                                           -> 200
+https://components.slicejs.com/                                 -> 200
+```
+
+Conclave production deployment `813cd5c` is READY and aliased to
+`conclave.vkneider.dev`. One push (`15807c2`) did not trigger a Vercel build;
+re-pushing the follow-up commit (`813cd5c`) triggered it normally.
