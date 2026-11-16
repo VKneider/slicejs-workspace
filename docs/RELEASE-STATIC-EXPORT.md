@@ -89,24 +89,53 @@ pnpm pack
 Run the packed-artifact smoke test from `docs/RELEASE.md` §4 with both `.tgz`
 files, then remove them (do not commit `*.tgz`).
 
-## 3. Publish
+## 3. Authenticate
+
+Publishing requires an npm session. `npm whoami` must print your username before
+continuing:
 
 ```powershell
+npm login
 npm whoami
+```
 
+The account uses `tfa.mode = auth-and-writes`, so npm/pnpm will ask for a
+6-digit OTP from the authenticator app. If `pnpm publish` fails with `EOTP`,
+repeat the command with `--otp`:
+
+```powershell
+pnpm publish --access public --otp 123456
+```
+
+If pnpm still does not pass the OTP, use npm for that publish:
+
+```powershell
+npm publish --access public --otp 123456
+```
+
+## 4. Publish
+
+```powershell
 cd "C:\Users\vkneider\Desktop\asdasd\slice-workspace\repos\slice.js"
 pnpm publish --access public
 npm view slicejs-web-framework@4.3.0 version
 
 cd ..\slicejs-cli
-pnpm publish --access public
+git stash push -u -m "pre-release unrelated"
+try {
+  pnpm publish --access public
+} finally {
+  git stash pop
+}
 npm view slicejs-cli@4.6.0 version
 ```
 
 Framework first. Do not publish the CLI before `slicejs-web-framework@4.3.0`
-is live.
+is live. The CLI has two unrelated files (`BACKLOG.md` and
+`features/0004-...`); the stash keeps `pnpm`'s clean-tree check happy and
+restores them after the publish attempt.
 
-## 4. Tags and GitHub releases
+## 5. Tags and GitHub releases
 
 ```powershell
 cd "C:\Users\vkneider\Desktop\asdasd\slice-workspace\repos\slice.js"
@@ -120,7 +149,7 @@ git push origin v4.6.0
 gh release create v4.6.0 --title "v4.6.0" --notes-file CHANGELOG.md
 ```
 
-## 5. Redirect consumers to the published pair
+## 6. Redirect consumers to the published pair
 
 The `package.json` ranges are already updated. After publish, refresh the
 lockfile and verify:
@@ -156,7 +185,7 @@ git -C repos/slicejs-lab commit -m "chore: adopt framework 4.3.0"
 
 Then push each repo's `master` branch.
 
-## 6. Deploy
+## 7. Deploy
 
 Only after both npm packages are live:
 
