@@ -2,7 +2,7 @@
 
 - **Canonical source:** `repos/slice.js_docs/skill/slice-js-developer`
 - **Upstream:** `https://github.com/VKneider/slicejs_docs/tree/master/skill/slice-js-developer`
-- **Vendored version:** `1.34.6`
+- **Vendored version:** `1.34.7`
 - **Targets:** `slicejs-web-framework ^4.2.x`
 - **Sync command:** `pnpm sync:skill`
 
