@@ -3,6 +3,9 @@
 The workspace never publishes anything. Publishing happens in the repo that owns the package, in a
 specific order, after the local validation described in [`TESTING.md`](./TESTING.md).
 
+For the static-export release, the prepared versions, checks and commands are in
+[`RELEASE-STATIC-EXPORT.md`](./RELEASE-STATIC-EXPORT.md).
+
 ## 1. Release order
 
 Only three packages are published to npm. Everything else is deployed or consumed from source.
@@ -26,11 +29,12 @@ a project. `slice sync` follows the default branch.
 
 | Consumer | Framework | CLI | Notes |
 |---|---|---|---|
-| `slicejs-cli` | `^4.0.2` (accepts 4.1.1) | — | 4.4.0 pairs with framework 4.1.1. |
-| Slice.js Components | `^4.1.1` | `^4.4.0` | Adopted the published pair; lockfile refreshed. |
-| portfolio | `^4.1.1` | `^4.4.0` | Adopted the published pair (same lint/typecheck stack). |
-| docs | `^3.5.1` | `^3.7.2` | Not yet upgraded; the workspace links it to 4.x to surface breakage. |
-| conclave | `^4.0.2` | `4.2.0` pinned | Bump the CLI when validating a new one (4.4.0 last tested). |
+| `slicejs-cli` | `^4.3.0` | — | 4.6.0 pairs with framework 4.3.0 (static export). |
+| Slice.js Components | `^4.3.0` | `^4.6.0` | Adopted the published pair; lockfile refreshed. |
+| portfolio | `^4.3.0` | `^4.6.0` | Adopted the published pair (same lint/typecheck stack). |
+| docs | `^4.3.0` | `^4.6.0` | Adopted the published pair. |
+| conclave | `^4.3.0` | `4.6.0` pinned | Bump the CLI when validating a new one. |
+| slicejs-lab | `^4.3.0` | — | Private lab app; uses the workspace-linked CLI. |
 
 The workspace overrides intentionally ignore these ranges. Before releasing, make sure the ranges
 in each `package.json` describe the combination you actually tested.
