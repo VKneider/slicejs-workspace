@@ -193,6 +193,8 @@ pnpm sync:skill                                      # if the skill changed
 - [`docs/FEATURES.md`](./docs/FEATURES.md) — the per-repo feature standard, statuses and CLI.
 - [`docs/DASHBOARD.md`](./docs/DASHBOARD.md) — the local features/repo-health dashboard and its data contract.
 - [`docs/LAB.md`](./docs/LAB.md) — the Slice.js lab app: SideMenu shell, navy themes and fluidity methodology.
+- [`docs/SLICE-EVALUATION.md`](./docs/SLICE-EVALUATION.md) — maturity, comparison with other frameworks and what to protect.
+- [`docs/SAAS-ARCHITECTURE.md`](./docs/SAAS-ARCHITECTURE.md) — module contract, session/tenant/permissions and backend middleware.
 - [`features/README.md`](./features/README.md) — workspace/ecosystem features only.
 - [`BACKLOG.md`](./BACKLOG.md) — short ordered workspace/ecosystem backlog.
 
